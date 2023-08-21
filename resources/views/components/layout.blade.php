@@ -8,7 +8,7 @@
     <link rel="icon" type="image/jpg" href="http://2.bp.blogspot.com/_HWxhcqu_65c/S8CkLsUhJpI/AAAAAAAAA6g/F0sF9duOxLo/s1600/LOGO_UNEG[1].jpg">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>{{$title}}</title>
+    <title>@yield('title')</title>
 </head>
 
 <body>
@@ -30,7 +30,7 @@
             </ul>
         </header>
 
-        {{$slot}}
+        {{ $slot }}
 
         <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
             <div class="col-md-4 d-flex align-items-center">
@@ -47,6 +47,10 @@
             </ul>
         </footer>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>
