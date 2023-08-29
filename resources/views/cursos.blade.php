@@ -1,40 +1,47 @@
 <x-layout>
     @section('title', 'Cursos')
 
-    @component('components.modal')
-        @slot('ButtonType', 'btn btn-primary mb-4')
-        @slot('ButtonText', 'Crear curso')
-        @slot('ModalId', 'ModalForm')
-        @slot('ModalLabel', 'ModalLabel')
-        @slot('ModalTitle', 'Formulario de curso')
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        @component('components.modal')
+            @slot('ButtonType', 'btn btn-primary me-2')
+            @slot('ButtonText', 'Crear curso')
+            @slot('ModalId', 'ModalForm')
+            @slot('ModalLabel', 'ModalLabel')
+            @slot('ModalTitle', 'Formulario de curso')
 
-        <div class="modal-body">
-            <form method="POST" action="{{ route('cursos') }}">
-                @csrf
-                <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombre</label>
-                    <input type="text" class="form-control" name="nombre" required>
-                </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ route('cursos') }}">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" name="nombre" required>
+                        </div>
 
-                <div class="mb-3">
-                    <label for="descripcion" class="form-label">Descripción</label>
-                    <input type="text" class="form-control" name="descripcion" required>
-                </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" name="descripcion" required>
+                        </div>
 
-                <div class="mb-3">
-                    <label for="f_inicio" class="form-label">Fecha de inicio</label>
-                    <input type="date" class="form-control" name="f_inicio" required>
-                </div>
+                        <div class="mb-3">
+                            <label for="f_inicio" class="form-label">Fecha de inicio</label>
+                            <input type="date" class="form-control" name="f_inicio" required>
+                        </div>
 
-                <div class="mb-3">
-                    <label for="f_finalizacion" class="form-label">Fecha de finalización</label>
-                    <input type="date" class="form-control" name="f_finalizacion" required>
-                </div>
+                        <div class="mb-3">
+                            <label for="f_finalizacion" class="form-label">Fecha de finalización</label>
+                            <input type="date" class="form-control" name="f_finalizacion" required>
+                        </div>
 
-                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
-            </form>
-        </div>
-    @endcomponent
+                    <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+                </form>
+            </div>
+        @endcomponent
+
+        <form action="{{ route('cursos.search') }}" method="GET" class="flex-grow-1 me-2 d-flex align-items-center">
+            <input type="text" class="form-control me-2" name="buscar" placeholder="Buscar por nombre">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+    </div>
 
     <!-- Tabla con los cursos disponibles -->
     <table class="table table-bordered">
@@ -46,7 +53,7 @@
           </tr>
         </thead>
         <tbody>
-            @foreach ($cursos as $curso)
+            @forelse ($cursos as $curso)
             <tr>
                 <td>{{ $curso->nombre }}</td>
                 <td>{{ $curso->f_inicio }}</td>
@@ -109,7 +116,12 @@
                     @endcomponent
                 </td>
             </tr>
-            @endforeach
+            @empty
+        <tr>
+            <td colspan="3">No se encontraron cursos.</td>
+        </tr>
+        @endforelse
+
         </tbody>
       </table>
 </x-layout>

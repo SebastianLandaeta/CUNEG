@@ -34,4 +34,13 @@ class CursoController extends Controller
         $curso->delete();
         return redirect()->route('cursos');
     }
+
+    public function search(Request $request)
+    {
+        $terminoBusqueda = $request->input('buscar');
+
+        $cursos = Curso::where('nombre', 'like', '%' . $terminoBusqueda . '%')->get();
+
+        return view('cursos', compact('cursos'));
+    }
 }

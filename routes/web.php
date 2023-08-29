@@ -25,3 +25,5 @@ Route::post('/cursos', [CursoController::class, 'store'])->name('cursos');
 Route::put('cursos/{curso}', [CursoController::class, 'update'])->name('cursos.update');
 
 Route::delete('cursos/{curso}', [CursoController::class, 'destroy'])->name('cursos.destroy');
+
+Route::get('/cursos/buscar', [CursoController::class, 'search'])->name('cursos.search');
