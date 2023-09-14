@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Curso;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CursoController extends Controller
 {
     public function index()
     {
-        $cursos = Curso::all();
+        $cursos = Curso::simplePaginate(8);
         return view('cursos', ['cursos' => $cursos]);
     }
 
@@ -39,7 +40,7 @@ class CursoController extends Controller
     {
         $terminoBusqueda = $request->input('buscar');
 
-        $cursos = Curso::where('nombre', 'like', '%' . $terminoBusqueda . '%')->get();
+        $cursos = Curso::where('nombre', 'like', '%' . $terminoBusqueda . '%')->paginate(8);;
 
         return view('cursos', compact('cursos'));
     }

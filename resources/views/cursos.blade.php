@@ -1,6 +1,7 @@
 <x-layout>
     @section('title', 'Cursos')
 
+    <!-- Modal para la creacion de cursos -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         @component('components.modal')
             @slot('ButtonType', 'btn btn-primary me-2')
@@ -37,6 +38,7 @@
             </div>
         @endcomponent
 
+        <!-- Buscador -->
         <form action="{{ route('cursos.search') }}" method="GET" class="flex-grow-1 me-2 d-flex align-items-center">
             <input type="text" class="form-control me-2" name="buscar" placeholder="Buscar por nombre">
             <button type="submit" class="btn btn-primary">Buscar</button>
@@ -59,6 +61,7 @@
                 <td>{{ $curso->f_inicio }}</td>
                 <td>{{ $curso->f_finalizacion }}</td>
                 <td>
+                    <!-- Modal para la modificacion de cursos -->
                     @component('components.modal')
                         @slot('ButtonType', 'btn btn-warning btn-sm')
                         @slot('ButtonText', 'Modificar')
@@ -95,6 +98,7 @@
                         </div>
                     @endcomponent
 
+                    <!-- Modal para la eliminación de cursos -->
                     @component('components.modal')
                         @slot('ButtonType', 'btn btn-danger btn-sm')
                         @slot('ButtonText', 'Eliminar')
@@ -117,11 +121,15 @@
                 </td>
             </tr>
             @empty
-        <tr>
-            <td colspan="3">No se encontraron cursos.</td>
-        </tr>
-        @endforelse
-
+            <tr>
+                <td colspan="3">No se encontraron cursos.</td>
+            </tr>
+            @endforelse
         </tbody>
       </table>
+
+      <!-- Enlaces de paginación -->
+        <div class="d-flex justify-content-center">
+            {{ $cursos->links() }}
+        </div>
 </x-layout>
