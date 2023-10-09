@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Curso;
+use App\Models\Participante;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ParticipantesImport;
+
 
 class CursoController extends Controller
 {
@@ -43,5 +46,41 @@ class CursoController extends Controller
         $cursos = Curso::where('nombre', 'like', '%' . $terminoBusqueda . '%')->paginate(8);;
 
         return view('cursos', compact('cursos'));
+    }
+
+    
+    public function loadedList(Request $request, $curso)
+    {
+        $cursoModel = Curso::find($curso);
+
+        if ($request->hasFile('documento')) {
+            $path = $request->file('documento')->getRealPath();
+
+            
+
+            // Verifica si el archivo no está vacío
+            if (file_exists($path) && filesize($path) > 0) {
+                
+                
+
+                if ($cursoModel) {
+                    if ($cursoModel->lista_cargada) {
+                        $cursoModel->participantes()->detach();
+                    }
+                }
+                
+                // Utiliza la clase ParticipantesImport para importar los datos del archivo CSV
+                $import = new ParticipantesImport($curso);
+                Excel::import($import, $path);
+
+                Curso::find($curso)->update(['lista_cargada' => true]);
+                return redirect()->route('cursos');
+                
+            } else {
+                return redirect()->back()->with('error', 'El archivo está vacío.');
+            }
+        }
+    
+        return redirect()->back()->withErrors(['error' => "No se seleccionó ningún archivo para el curso '{$cursoModel->nombre}'"]);
     }
 }

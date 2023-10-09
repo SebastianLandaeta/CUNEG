@@ -27,3 +27,6 @@ Route::put('cursos/{curso}', [CursoController::class, 'update'])->name('cursos.u
 Route::delete('cursos/{curso}', [CursoController::class, 'destroy'])->name('cursos.destroy');
 
 Route::get('/cursos/buscar', [CursoController::class, 'search'])->name('cursos.search');
+
+Route::post('curso/LoadList/{curso}', [CursoController::class, 'loadedList'])->name('curso.loadedList');
+
