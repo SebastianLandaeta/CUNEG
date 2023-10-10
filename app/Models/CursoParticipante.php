@@ -10,4 +10,6 @@ class CursoParticipante extends Model
     use HasFactory;
 
     protected $table = "cursosparticipantes";
+    public $timestamps = false;
 }
+

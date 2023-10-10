@@ -1,6 +1,8 @@
 <x-layout>
     @section('title', 'Cursos')
 
+
+
     <!-- Modal para la creacion de cursos -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         @component('components.modal')
@@ -45,6 +47,13 @@
         </form>
     </div>
 
+    <!-- Mensaje de error -->
+    @if($errors->any())
+        <div class="alert alert-danger">
+            {{ $errors->first('error') }}
+        </div>
+    @endif
+
     <!-- Tabla con los cursos disponibles -->
     <table class="table table-bordered">
         <thead>
@@ -61,6 +70,37 @@
                 <td>{{ $curso->f_inicio }}</td>
                 <td>{{ $curso->f_finalizacion }}</td>
                 <td>
+
+                    <!--Modal para cargar lista de participantes-->
+                    @component('components.modal')
+                        
+                        @if (!$curso->lista_cargada)
+                            @slot('ButtonType', 'btn btn-info btn-sm')
+                            @slot('ButtonText', 'Cargar Lista')
+                            @slot('ModalTitle', 'Carga de listado de participantes')
+                        @else
+                            @slot('ButtonType', 'btn btn-success btn-sm')
+                            @slot('ButtonText', 'Actualizar Lista')
+                            @slot('ModalTitle', 'Actualizacion de listado de participantes')
+                        @endif
+                        @slot('ModalId', 'ModalDeCarga' . $curso->id )
+                        @slot('ModalLabel', 'ModalCargaLabel' . $curso->id )
+                        
+
+                        <div class="modal-body">
+                            <form action="{{ route('curso.loadedList', $curso) }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="clo-md-6 pb-2">
+                                    <input class="form-control" type="file" name="documento">
+                                </div>
+                                <div class="clo-md-6">
+                                    <button class="btn btn-outline-primary d-grid mx-auto" type="submit">Importar Lista</button>
+                                </div>
+                            </form>
+                        </div>
+                    @endcomponent
+
+
                     <!-- Modal para la modificacion de cursos -->
                     @component('components.modal')
                         @slot('ButtonType', 'btn btn-warning btn-sm')
@@ -130,6 +170,6 @@
 
       <!-- Enlaces de paginación -->
         <div class="d-flex justify-content-center">
-            {{ $cursos->links() }}
+           {{ $cursos->links() }}
         </div>
 </x-layout>

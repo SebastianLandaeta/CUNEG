@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('curso_fk')->references('id')->on('cursos');
             $table->unsignedBigInteger('participante_fk');
             $table->foreign('participante_fk')->references('cedula')->on('participantes');
-            $table->timestamps();
+            //$table->timestamps();
         });
     }
 

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->integer('cedula')->primary();
             $table->string('nombre');
             $table->string('apellido');
+            $table->string('email')->unique();
             $table->string('rol');
-            $table->timestamps();
         });
     }
 

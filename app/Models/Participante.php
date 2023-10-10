@@ -7,9 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Participante extends Model
 {
-    use HasFactory;
-
     protected $primaryKey = 'cedula';
+    protected $fillable = [
+        'cedula',
+        'nombre',
+        'apellido',
+        'email',
+        'rol'
+    ];
+    public $timestamps = false;
 
-    protected $incrementing = false;
+    public function cursos()
+    {
+        return $this->belongsToMany(Curso::class, 'cursosparticipantes', 'participante_fk', 'curso_fk');
+    }
 }

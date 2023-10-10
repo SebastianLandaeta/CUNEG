@@ -9,5 +9,14 @@ class Curso extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre', 'descripcion', 'f_inicio', 'f_finalizacion'];
+    protected $fillable = ['nombre', 'descripcion', 'f_inicio', 'f_finalizacion', "lista_cargada"];
+
+    protected $attributes = [
+        'lista_cargada' => false,
+    ];
+
+    public function participantes()
+    {
+        return $this->belongsToMany(Participante::class, 'cursosparticipantes', 'curso_fk', 'participante_fk');
+    }
 }

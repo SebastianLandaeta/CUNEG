@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('descripcion');
             $table->date('f_inicio');
             $table->date('f_finalizacion');
+            $table->boolean('lista_cargada');
             $table->timestamps();
         });
     }
