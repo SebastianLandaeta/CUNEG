@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< Updated upstream
     "content-hash": "1dc2f7602643678c670399145ee7fd00",
+=======
+    "content-hash": "5accd2e743929eb7d836053d844d62bb",
+>>>>>>> Stashed changes
     "packages": [
         {
             "name": "brick/math",
@@ -976,6 +980,7 @@
         },
         {
             "name": "laravel/framework",
+<<<<<<< Updated upstream
             "version": "v10.12.0",
             "source": {
                 "type": "git",
@@ -986,6 +991,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/laravel/framework/zipball/9e6dcff23ab1d4b522bef56074c31625cf077576",
                 "reference": "9e6dcff23ab1d4b522bef56074c31625cf077576",
+=======
+            "version": "v10.27.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/framework.git",
+                "reference": "616f81bd6dd8aa2e26a9fc21d9c95e98bd30803b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/616f81bd6dd8aa2e26a9fc21d9c95e98bd30803b",
+                "reference": "616f81bd6dd8aa2e26a9fc21d9c95e98bd30803b",
+>>>>>>> Stashed changes
                 "shasum": ""
             },
             "require": {
@@ -1172,7 +1189,68 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
+<<<<<<< Updated upstream
             "time": "2023-05-23T18:04:16+00:00"
+=======
+            "time": "2023-10-09T15:15:28+00:00"
+        },
+        {
+            "name": "laravel/prompts",
+            "version": "v0.1.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/prompts.git",
+                "reference": "cce65a90e64712909ea1adc033e1d88de8455ffd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/prompts/zipball/cce65a90e64712909ea1adc033e1d88de8455ffd",
+                "reference": "cce65a90e64712909ea1adc033e1d88de8455ffd",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "illuminate/collections": "^10.0|^11.0",
+                "php": "^8.1",
+                "symfony/console": "^6.2"
+            },
+            "conflict": {
+                "illuminate/console": ">=10.17.0 <10.25.0",
+                "laravel/framework": ">=10.17.0 <10.25.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.5",
+                "pestphp/pest": "^2.3",
+                "phpstan/phpstan": "^1.10",
+                "phpstan/phpstan-mockery": "^1.1"
+            },
+            "suggest": {
+                "ext-pcntl": "Required for the spinner to be animated."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "0.1.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Laravel\\Prompts\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel/prompts/issues",
+                "source": "https://github.com/laravel/prompts/tree/v0.1.11"
+            },
+            "time": "2023-10-03T01:07:35+00:00"
+>>>>>>> Stashed changes
         },
         {
             "name": "laravel/sanctum",
@@ -6441,6 +6519,7 @@
         },
         {
             "name": "phpunit/phpunit",
+<<<<<<< Updated upstream
             "version": "10.1.3",
             "source": {
                 "type": "git",
@@ -6451,6 +6530,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2379ebafc1737e71cdc84f402acb6b7f04198b9d",
                 "reference": "2379ebafc1737e71cdc84f402acb6b7f04198b9d",
+=======
+            "version": "10.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/phpunit.git",
+                "reference": "62bd7af13d282deeb95650077d28ba3600ca321c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/62bd7af13d282deeb95650077d28ba3600ca321c",
+                "reference": "62bd7af13d282deeb95650077d28ba3600ca321c",
+>>>>>>> Stashed changes
                 "shasum": ""
             },
             "require": {
@@ -6522,7 +6613,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
+<<<<<<< Updated upstream
                 "source": "https://github.com/sebastianbergmann/phpunit/tree/10.1.3"
+=======
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.4.1"
+>>>>>>> Stashed changes
             },
             "funding": [
                 {
@@ -6538,7 +6633,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< Updated upstream
             "time": "2023-05-11T05:16:22+00:00"
+=======
+            "time": "2023-10-08T05:01:11+00:00"
+>>>>>>> Stashed changes
         },
         {
             "name": "sebastian/cli-parser",
@@ -7666,6 +7765,7 @@
         },
         {
             "name": "spatie/laravel-ignition",
+<<<<<<< Updated upstream
             "version": "2.1.3",
             "source": {
                 "type": "git",
@@ -7676,6 +7776,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/35711943d4725aa80f8033e4f1cb3a6775530b25",
                 "reference": "35711943d4725aa80f8033e4f1cb3a6775530b25",
+=======
+            "version": "2.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-ignition.git",
+                "reference": "bf21cd15aa47fa4ec5d73bbc932005c70261efc8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/bf21cd15aa47fa4ec5d73bbc932005c70261efc8",
+                "reference": "bf21cd15aa47fa4ec5d73bbc932005c70261efc8",
+>>>>>>> Stashed changes
                 "shasum": ""
             },
             "require": {
@@ -7754,7 +7866,11 @@
                     "type": "github"
                 }
             ],
+<<<<<<< Updated upstream
             "time": "2023-05-25T11:30:27+00:00"
+=======
+            "time": "2023-10-09T12:55:26+00:00"
+>>>>>>> Stashed changes
         },
         {
             "name": "symfony/yaml",
