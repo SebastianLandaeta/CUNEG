@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ParticipantsExport;
 use App\Http\Controllers\Controller;
 use App\Models\Curso;
 use App\Models\Participante;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\ParticipantesImport;
+use Maatwebsite\Excel\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
 class CursoController extends Controller
@@ -35,8 +36,14 @@ class CursoController extends Controller
 
     public function destroy(Curso $curso)
     {
+        $curso->cursosParticipantes()->delete();
+        
+        Participante::whereDoesntHave('cursoParticipantes')->delete();
+
         $curso->delete();
+
         return redirect()->route('cursos');
+        
     }
 
     public function search(Request $request)
@@ -48,39 +55,58 @@ class CursoController extends Controller
         return view('cursos', compact('cursos'));
     }
 
-    
+
     public function loadedList(Request $request, $curso)
     {
-        $cursoModel = Curso::find($curso);
 
-        if ($request->hasFile('documento')) {
-            $path = $request->file('documento')->getRealPath();
+    $cursoModel = Curso::find($curso);   
 
+    $helper = new \App\Helpers\FileProcessing\FileProcessing();
+
+    if ($request->hasFile('documento')) {
+        $path = $request->file('documento')->getRealPath();
             
-
-            // Verifica si el archivo no está vacío
-            if (file_exists($path) && filesize($path) > 0) {
-                
-                
-
-                if ($cursoModel) {
-                    if ($cursoModel->lista_cargada) {
-                        $cursoModel->participantes()->detach();
-                    }
+            $validFormats = ['xlsx', 'xls'];
+            $extension = $request->file('documento')->getClientOriginalExtension();
+    
+            if (in_array($extension, $validFormats)) {
+                $participantes = $helper->importOfParticipantes($path);
+            
+                if (count($participantes)<1) {
+                    return redirect()->back()->withErrors(['error' => "El archivo para '{$cursoModel->nombre}' está vacío o tiene estructura incorrecta"]);
                 }
-                
-                // Utiliza la clase ParticipantesImport para importar los datos del archivo CSV
-                $import = new ParticipantesImport($curso);
-                Excel::import($import, $path);
-
-                Curso::find($curso)->update(['lista_cargada' => true]);
-                return redirect()->route('cursos');
-                
+    
+                if ($helper->validateParticipantes($participantes) == false) {
+    
+                    return response()->view('DataError', compact('participantes'));
+                        
+                } else {
+                    $helper->saveParticipantes($participantes, $curso);
+                    return redirect()->route('cursos');
+                }
             } else {
-                return redirect()->back()->with('error', 'El archivo está vacío.');
+                return redirect()->back()->withErrors(['error' => "El archivo para '{$cursoModel->nombre}' no está en una extension válida (xlsx o xls)."]);
             }
         }
-    
         return redirect()->back()->withErrors(['error' => "No se seleccionó ningún archivo para el curso '{$cursoModel->nombre}'"]);
     }
+
+    public function downloadExcelExample()
+    {
+        $rutaArchivo = storage_path('app\public\Listado-Ejemplo.xlsx'); 
+
+        return response()->download($rutaArchivo, 'Listado_Participantes.xlsx');
+    }
+
+
+    public function ExtractList($cursoId, Excel $excel)
+    {
+        $curso = Curso::find($cursoId);
+
+        $fileName = 'Participantes_' . $curso->nombre . '_' . $cursoId . '.xlsx';
+
+        return $excel->download(new ParticipantsExport($cursoId), $fileName);
+    }
+
+
 }

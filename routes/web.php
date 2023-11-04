@@ -30,3 +30,7 @@ Route::get('/cursos/buscar', [CursoController::class, 'search'])->name('cursos.s
 
 Route::post('curso/LoadList/{curso}', [CursoController::class, 'loadedList'])->name('curso.loadedList');
 
+Route::get('/download-excel-example',[CursoController::class, 'downloadExcelExample'])->name('d-excel');
+
+Route::get('curso/LoadList/{curso}', [CursoController::class, 'ExtractList'])->name('curso.ExtractList');
+

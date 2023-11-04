@@ -15,6 +15,11 @@ class Curso extends Model
         'lista_cargada' => false,
     ];
 
+    public function cursosParticipantes()
+    {
+        return $this->hasMany(CursoParticipante::class, 'curso_fk', 'id');
+    }
+
     public function participantes()
     {
         return $this->belongsToMany(Participante::class, 'cursosparticipantes', 'curso_fk', 'participante_fk');

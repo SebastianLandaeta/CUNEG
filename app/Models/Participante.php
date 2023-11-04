@@ -13,12 +13,17 @@ class Participante extends Model
         'nombre',
         'apellido',
         'email',
-        'rol'
     ];
+    
     public $timestamps = false;
 
     public function cursos()
     {
         return $this->belongsToMany(Curso::class, 'cursosparticipantes', 'participante_fk', 'curso_fk');
+    }
+
+    public function cursoParticipantes()
+    {
+        return $this->hasMany(CursoParticipante::class, 'participante_fk', 'cedula');
     }
 }

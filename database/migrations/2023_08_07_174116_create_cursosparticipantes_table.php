@@ -1,10 +1,10 @@
-<?php
+<?php 
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateCursosParticipantesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('cursosparticipantes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('curso_fk');
-            $table->foreign('curso_fk')->references('id')->on('cursos');
             $table->unsignedBigInteger('participante_fk');
+            $table->string('rol'); 
+
+            $table->foreign('curso_fk')->references('id')->on('cursos');
             $table->foreign('participante_fk')->references('cedula')->on('participantes');
-            //$table->timestamps();
         });
     }
 
@@ -28,4 +29,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('cursosparticipantes');
     }
-};
+}
