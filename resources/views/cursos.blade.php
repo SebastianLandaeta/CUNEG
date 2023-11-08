@@ -111,10 +111,10 @@
                                 <div class="clo-md-6 d-flex align-items-center justify-content-center">
                                     <button class="btn btn-outline-success">Extraer Lista</button>
                                 </div>
-            
+
                             </form>
                         </div>
-                        
+
                     @endcomponent
                 @endif
 
@@ -127,7 +127,7 @@
                         @else
                             @slot('ButtonType', 'btn btn-success btn-sm')
                             @slot('ButtonText', 'Actualizar Lista')
-                            @slot('ModalTitle', 'Actualizacion de listado de participantes')    
+                            @slot('ModalTitle', 'Actualizacion de listado de participantes')
                         @endif
                             @slot('ModalId', 'ModalDeCarga' . $curso->id )
                             @slot('ModalLabel', 'ModalCargaLabel' . $curso->id )
@@ -145,19 +145,19 @@
                                             <li>Si un participante es registrado nuevamente desde cualquier listado de cualquier curso, sus datos personales se actualizaran segun la nueva lista.</li>
                                         </ul>
                                     <div class="clo-md-6 pb-2">
-                                        <input class="form-control" type="file" name="documento">
+                                        <input class="form-control" type="file" name="documento" accept=".xls, .xlsx">
                                     </div>
-                                    
+
                                     <div class="clo-md-6 d-flex align-items-center justify-content-center">
                                         <a href="{{ route('d-excel') }}" class="btn btn-outline-secondary m-2">Modelo Excel</a>
                                         <button class="btn btn-outline-primary m-2" type="submit">Importar Lista</button>
                                     </div>
-                                
+
                                 </form>
                             </div>
                     @endcomponent
 
-                    
+
 
                     <!-- Modal para la modificacion de cursos -->
                     @component('components.modal')
