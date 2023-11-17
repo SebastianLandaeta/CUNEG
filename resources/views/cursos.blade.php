@@ -55,7 +55,8 @@
     <!-- Tabla con los cursos disponibles -->
     <table class="table table-bordered">
         <thead>
-        <tr>
+        <tr>   
+            <th scope="col">ID</th>
             <th scope="col">Curso</th>
             <th scope="col">Fecha de inicio</th>
             <th scope="col">Fecha de finalización</th>
@@ -63,7 +64,8 @@
         </thead>
         <tbody>
             @forelse ($cursos as $curso)
-            <tr>
+            <tr> 
+                <td>{{ $curso->id }}
                 <td>{{ $curso->nombre }}</td>
                 <td>{{ $curso->f_inicio }}</td>
                 <td>{{ $curso->f_finalizacion }}</td>

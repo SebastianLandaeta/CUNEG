@@ -14,16 +14,16 @@
 <body>
     <div class="container">
         <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-            <a href="/"
+            <a href="{{ route('index') }}"
                 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
                 <img src="http://2.bp.blogspot.com/_HWxhcqu_65c/S8CkLsUhJpI/AAAAAAAAA6g/F0sF9duOxLo/s1600/LOGO_UNEG[1].jpg" alt="Custom Icon" width="40" height="40" class="me-2">
                 <span class="fs-4">CUNEG</span>
             </a>
 
             <ul class="nav nav-pills">
-                <li class="nav-item" class="na"><a href="#" class="nav-link" aria-current="page">Home</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
+                <li class="nav-item"><a href="{{ route('index') }}" class="nav-link" aria-current="page">Inicio</a></li>
+                <li class="nav-item"><a href="{{ route('cursos') }}" class="nav-link">Cursos</a></li>
+                <li class="nav-item"><a href="{{ route('qr.search') }}" class="nav-link">Consulta de Certificado</a></li>
                 <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>
                 <li class="nav-item"><a href="#" class="nav-link active">About</a></li>
