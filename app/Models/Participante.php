@@ -19,7 +19,7 @@ class Participante extends Model
 
     public function cursos()
     {
-        return $this->belongsToMany(Curso::class, 'cursosparticipantes', 'participante_fk', 'curso_fk');
+        return $this->belongsToMany(Curso::class, 'cursoParticipantes', 'participante_fk', 'curso_fk');
     }
 
     public function cursoParticipantes()

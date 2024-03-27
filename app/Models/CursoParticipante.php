@@ -9,7 +9,7 @@ class CursoParticipante extends Model
 {
     use HasFactory;
 
-    protected $table = "cursosparticipantes";
+    protected $table = "cursoParticipantes";
 
     protected $fillable = ['rol'];
     public $timestamps = false;

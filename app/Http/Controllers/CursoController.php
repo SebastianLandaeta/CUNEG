@@ -8,7 +8,6 @@ use App\Models\Curso;
 use App\Models\Participante;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Excel;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
 class CursoController extends Controller
@@ -108,5 +107,12 @@ class CursoController extends Controller
         return $excel->download(new ParticipantsExport($cursoId), $fileName);
     }
 
+    public function deleteList(Curso $curso)
+    {
+        $curso->participantes()->detach(); // Elimina los participantes asociados al curso
+        $curso->lista_cargada = false; // Actualiza el valor booleano
+        $curso->save();
 
+        return redirect()->back()->with('success', 'Lista cargada eliminada correctamente');
+    }
 }

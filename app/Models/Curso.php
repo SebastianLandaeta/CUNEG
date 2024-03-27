@@ -8,20 +8,27 @@ use Illuminate\Database\Eloquent\Model;
 class Curso extends Model
 {
     use HasFactory;
+    public $timestamps = false;
 
-    protected $fillable = ['nombre', 'descripcion', 'f_inicio', 'f_finalizacion', "lista_cargada"];
+    protected $fillable = ['nombre', 'descripcion', 'f_inicio', 'f_finalizacion', "lista_cargada", "certificado_cargado"];
 
     protected $attributes = [
         'lista_cargada' => false,
+        'certificado_cargado' => false
     ];
 
-    public function cursosParticipantes()
+    public function cursoParticipantes()
     {
         return $this->hasMany(CursoParticipante::class, 'curso_fk', 'id');
     }
 
     public function participantes()
     {
-        return $this->belongsToMany(Participante::class, 'cursosparticipantes', 'curso_fk', 'participante_fk');
+        return $this->belongsToMany(Participante::class, 'cursoParticipantes', 'curso_fk', 'participante_fk');
+    }
+
+    public function certificados()
+    {
+        return $this->hasMany(CursoCertificado::class, 'idCurso');
     }
 }
