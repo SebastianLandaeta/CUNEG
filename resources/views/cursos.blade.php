@@ -271,7 +271,7 @@
                     @slot('ModalLabel', 'ModalEliminacionParticipantesLabel' . $curso->id )
                     @slot('ModalSize', 'modal-dialog')
                     <div class="modal-body">
-                        ¿Estás seguro de que deseas eliminar los participantes de este curso?
+                        ¿Estás seguro de que deseas eliminar los participantes del curso: <b>"{{$curso->nombre}}"</b>?
                     </div>
                     <div class="modal-footer">
                     <!-- Formulario para eliminar el listado cargado -->
@@ -281,8 +281,8 @@
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
                             <button type="submit" class="btn btn-danger">Eliminar Lista</button>
                         </form>
-                    </div>W
-                    @endcomponent
+                    </div>
+                @endcomponent
 
                     <!-- Boton propiedades del diseño del certificado del curso-->
                     <div class="p-2">
@@ -293,8 +293,8 @@
                             <ul class="dropdown-menu">
                                 
                                     <li>
-                                        <a href="{{route('pizarra.index', ['idCurso' => $curso->id])}}" class="dropdown-item">
-                                            Crear/Actualizar diseño nuevo
+                                        <a href="{{route('pizarra.index', ['curso' => $curso])}}" class="dropdown-item">
+                                            Crear diseño nuevo
                                         </a>
                                     </li>
                                     
@@ -306,7 +306,7 @@
                                         </li>
 
                                         <li>
-                                            <a href="#" class="dropdown-item">
+                                            <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#{{'ModalDeEliminacionCertificado' . $curso->id}}">
                                                 Eliminar diseño
                                             </a>
                                         </li>
@@ -314,20 +314,47 @@
                             </ul>
                         </div>
                     </div>
+
+                    <div class="p-2">
+                        <a href="{{ route('emitir_certificados',['curso' => $curso]) }}"
+                        class="{{$curso->certificado_cargado && $curso->lista_cargada? "btn btn-primary":"btn btn-primary disabled"}}"
+                        type="button">
+                            Emitir certificados
+                        </a>
+                    </div>
                 </td>
             </tr>
             
+            <!--Modal para VISUALIZAR diseño de certificado-->
             @component('components.modal')
                 @slot('ModalTitle', 'Visualizacion de pizarra')
                 @slot('ModalId', 'Pizarra' . $curso->id )
                 @slot('ModalLabel', 'PizarraLabel' . $curso->id )
                 @slot('ModalSize', 'modal-dialog modal-xl modal-dialog-centered')
-                    <div class="container container_pizarra">
-                        <canvas id="previewCanvas" class="d-block mx-auto" width="800" height="600" style="border: 1px solid #ccc;"></canvas>
+                    <div class="container container_pizarra" style="overflow: auto; width: 100%; height: 80vh;">
+                        <canvas id="previewCanvas_{{$curso->id}}" class="d-block mx-auto" width="800" height="600" style="border: 1px solid #ccc;"></canvas>
                     </div>
             @endcomponent
 
-
+            <!--Modal para ELIMINAR diseño de certificado-->
+            @component('components.modal')
+                @slot('ModalTitle', 'Eliminar diseño de certificado')
+                @slot('ModalId', 'ModalDeEliminacionCertificado' . $curso->id )
+                @slot('ModalLabel', 'ModalEliminacionCertificadoLabel' . $curso->id )
+                @slot('ModalSize', 'modal-dialog')
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar el diseño del certificado del curso: <b>"{{$curso->nombre}}"</b>?
+                </div>
+                <div class="modal-footer">
+                <!-- Formulario para eliminar el listado cargado -->
+                    <form action="{{ route('pizarra.eliminar', $curso) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar Lista</button>
+                    </form>
+                </div>
+            @endcomponent
 
             @empty
                 <tr>
@@ -344,127 +371,28 @@
         </div>
 </x-layout>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
-
+<script src="{{ asset('js/construir_pizarra_ejemplo.js') }}"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const canvas = document.getElementById('previewCanvas');
-        const ctx = canvas.getContext('2d');
-
-        function dibujarObjetos(data) {
-            data.formasSimples.forEach(function(objeto) {
-                if (objeto.type === 'rect') {
-                    dibujarRectangulo(objeto);
-                } else if (objeto.type === 'circle') {
-                    dibujarCirculo(objeto);
-                }
+    document.addEventListener("DOMContentLoaded", function () {
+        const visualizarEnlaces = document.querySelectorAll('.item_visualizacion');
+        // Event listener para los enlaces de visualización
+        visualizarEnlaces.forEach(enlace => {
+            enlace.addEventListener('click', function (event) {
+                event.preventDefault();
+                const idCurso = this.getAttribute('data-id');
+                visualizarPizarra(idCurso);
             });
-
-            data.formasEspeciales.forEach(function(objeto) {
-                if (objeto.type === 'name') {
-                    dibujarTexto(objeto);
-                } else if (objeto.type === 'qr') {
-                    dibujarCodigoQR(objeto.qr_encode, objeto.left, objeto.top, objeto.width);
-                }
-            });
-        }
-
-        function dibujarRectangulo(objeto) {
-            ctx.save(); // Guardar el estado actual del contexto
-            ctx.translate(objeto.left, objeto.top); // Mover el origen al punto de partida del rectángulo
-            ctx.rotate((objeto.angle * Math.PI) / 180); // Rotar el contexto según el ángulo de inclinación
-            ctx.fillStyle = objeto.fill;
-            ctx.fillRect(objeto.width * objeto.scaleX /180, objeto.height * objeto.scaleY /180, objeto.width * objeto.scaleX, objeto.height * objeto.scaleY); // Dibujar el rectángulo desde el punto de partida real
-            ctx.restore(); // Restaurar el estado del contexto
-        }
-
-        function dibujarCirculo(objeto) {
-            ctx.save(); // Guardar el estado actual del contexto
-                if (objeto.scaleX === objeto.scaleY && objeto.angle === 0) {
-                    // Si la escala en X es igual a la escala en Y y no hay rotación, dibujar un círculo perfecto con ctx.arc
-                    ctx.beginPath();
-                    ctx.fillStyle = objeto.fill;
-                    ctx.arc(objeto.left + objeto.radius * objeto.scaleX, objeto.top + objeto.radius * objeto.scaleY, objeto.radius * objeto.scaleX, 0, 2 * Math.PI); // Dibujar el círculo desde el punto de partida (0, 0)
-                    ctx.fill(); // Rellenar el círculo
-                } else {
-                    ctx.translate(objeto.left, objeto.top); // Mover el origen al centro del círculo
-                    ctx.rotate((objeto.angle * Math.PI) / 180); // Rotar el contexto según el ángulo de inclinación
-                    // Dibujar una elipse con ctx.ellipse
-                    ctx.beginPath();
-                    ctx.fillStyle = objeto.fill;
-                    ctx.ellipse(((objeto.radius * objeto.scaleX + 0.18)),((objeto.radius * objeto.scaleY + 0.18 )), objeto.radius * objeto.scaleX, objeto.radius * objeto.scaleY, 0, 0, 2*Math.PI);
-                    ctx.fill(); // Rellenar la elipse
-                }
-
-                ctx.restore(); // Restaurar el estado del contexto
-            }
-
-            // Función para dibujar texto
-            function dibujarTexto(objeto) {
-                ctx.save(); // Guardar el estado actual del contexto
-
-                // Mover el origen al punto de inicio del texto
-                ctx.translate(objeto.left, objeto.top);
-
-                // Rotar el contexto según el ángulo de inclinación
-                ctx.rotate((objeto.angle * Math.PI) / 180);
-
-                // Configurar el estilo de texto
-                ctx.fillStyle = objeto.fill;
-                ctx.font = objeto.fontSize + "px Arial"; // Establecer el tamaño y el tipo de fuente
-
-                // Alinear el texto según el centro
-                //ctx.textAlign = "center";
-                //ctx.textBaseline = "middle";
-
-                // Dibujar el texto en el punto de origen (0, 0)
-                ctx.fillText(objeto.texto, 0, 0+objeto.fontSize);
-
-                ctx.restore(); // Restaurar el estado del contexto
-            }
-
-            // Función para dibujar un código QR
-            function dibujarCodigoQR(src, left, top, size) {
-                var qr_encode = "data:image/png;base64," + src;
-                var img = new Image();
-                img.onload = function() {
-                    ctx.drawImage(img, left, top, size, size);
-                };
-                img.src = qr_encode;
-            }
+        });
+    });
 
     function visualizarPizarra(idCurso) {
-        fetch('{{ route("pizarra.visualizar") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}' // Asegúrate de incluir el token CSRF si estás utilizando Laravel
-            },
-            body: JSON.stringify({ idCurso: idCurso }) // Envía el ID del curso como parte del cuerpo de la solicitud
-        })
+    fetch('{{ route("pizarra.visualizar") }}?idCurso=' + idCurso)
         .then(response => response.json())
         .then(data => {
-            // Imprimir los datos recibidos en la consola del navegador
             console.log('Datos de la pizarra:', data);
-            dibujarObjetos(data);
+            dibujarObjetos(data, idCurso);
         })
         .catch(error => console.error('Error al obtener los datos de la pizarra:', error));
     }
 
-    const visualizarEnlaces = document.querySelectorAll('.item_visualizacion');
-    
-    // Iterar sobre cada elemento encontrado
-    visualizarEnlaces.forEach(enlace => {
-        // Agregar un event listener para el evento 'click'
-        enlace.addEventListener('click', function(event) {
-            // Evitar que el enlace realice la acción por defecto (navegación)
-            event.preventDefault();
-            // Obtener el ID del curso desde el atributo data-id
-            const idCurso = this.getAttribute('data-id');
-            // Hacer la petición para visualizar la pizarra
-            visualizarPizarra(idCurso);
-        });
-    });
-
-});
 </script>

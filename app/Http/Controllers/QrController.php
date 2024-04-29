@@ -9,6 +9,8 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Curso;
 use App\Models\Participante;
 
+define("IPV4", "192.168.1.110");
+define("PUERTO", "80");
 
 class QrController extends Controller
 {
@@ -19,21 +21,18 @@ class QrController extends Controller
     public function generateQr(Request $request)
     {
         $helper = new \App\Helpers\QrProcessing\QrProcessing();
-
-        $Ipv4 = "192.168.1.109"; //<----- ipv4 del equipo donde se este ejecutando el xampp
-        $puerto = "80"; // <----- Puerto configurado en el xampp
         
         $idCurso = $request->input('idCurso');
         $cedulaEstudiante = $request->input('cedulaEstudiante');
 
         $url = route('qr_response', ['cursoId' => $idCurso, 'participanteId' => $cedulaEstudiante]);// <--- SOLO SIRVE DE FORMA LOCAL
         
-        $url = str_replace('localhost', "$Ipv4:$puerto", $url);
+        $url = str_replace('localhost', IPV4.":".PUERTO, $url);
 
         // Generar el código QR en formato SVGWS
         $qrCode = QrCode::size(200)->generate($url);
 
-        $helper->Save_Qr($url); //<--- Salva en carpeta
+        //$helper->Save_Qr($url); //<--- Salva en carpeta
 
         // Devolver el código QR en formato SVG como respuesta JSON
         return response($qrCode)
@@ -62,6 +61,21 @@ class QrController extends Controller
         }
     }
 
-    
+    public function generarQrParticipante(Request $request){
+        $idCurso = $request->input('idCurso');
+        $cedula = $request->input('cedula');
+        $anchoQR = $request->input('anchoQR');
+
+        $url = route('qr_response', ['cursoId' => $idCurso, 'participanteId' => $cedula]);// <--- SOLO SIRVE DE FORMA LOCAL
+        
+        $url = str_replace('localhost', IPV4.":".PUERTO, $url);
+
+        // Generar el código QR en formato SVG
+        $qrCode = QrCode::size($anchoQR)->generate($url);
+
+        // Devolver el código QR en formato SVG como respuesta JSON
+        return response($qrCode)
+        ->header('Content-Type', 'image/svg+xml');
+    }
 
 }

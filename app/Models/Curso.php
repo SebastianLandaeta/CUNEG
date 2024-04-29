@@ -27,8 +27,8 @@ class Curso extends Model
         return $this->belongsToMany(Participante::class, 'cursoParticipantes', 'curso_fk', 'participante_fk');
     }
 
-    public function certificados()
+    public function certificado()
     {
-        return $this->hasMany(CursoCertificado::class, 'idCurso');
+        return $this->hasOne(CursoCertificado::class, 'idCurso');
     }
 }

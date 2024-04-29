@@ -4,6 +4,7 @@ use App\Http\Controllers\QrController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\PizarraController;
+use App\Http\Controllers\CertificadoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,28 +46,32 @@ Route::get('certificate_search_qr', [QrController::class, 'index'])->name('qr.se
 
 Route::post('certificate_search_qr', [QrController::class, 'generateQr'])->name('qr.search.generate');
 
+Route::post('qr_participant', [QrController::class, 'generarQrParticipante'])->name('qr.participant');
+
 Route::get('certificate_search_qr/{cursoId}/{participanteId}', [QrController::class,'responseQr'])->name('qr_response');
 
 //Pizarra
 Route::prefix('pizarra')->group(function () {
+
     // Vista para el diseño de certificado
-    Route::get('/crear/{idCurso}', [PizarraController::class, 'index'])->name('pizarra.index');
-
-    Route::post('/visualizar_curso', [PizarraController::class, 'visualizarPizarra'])->name('pizarra.visualizar');
-
+    Route::get('/crear/{curso}', [PizarraController::class, 'index'])->name('pizarra.index');
+    
     // Guardar el diseño del certificado
-    Route::post('/guardar/{idCurso}', [PizarraController::class, 'guardar'])->name('pizarra.guardar');
+    Route::post('/{curso}', [PizarraController::class, 'guardar'])->name('pizarra.guardar');
 
-    // Vista para editar el diseño del certificado
-    Route::get('/editar/{id}', [PizarraController::class, 'editar'])->name('pizarra.editar');
-
-    // Actualizar el diseño del certificado
-    Route::put('/actualizar/{id}', [PizarraController::class, 'actualizar'])->name('pizarra.actualizar');
+    //Visualizar certificado
+    Route::get('/visualizar_curso', [PizarraController::class, 'visualizarPizarra'])->name('pizarra.visualizar');
 
     // Eliminar el diseño del certificado
-    Route::delete('/eliminar/{id}', [PizarraController::class, 'eliminar'])->name('pizarra.eliminar');
-
-    Route::get('/canvas-modificado/{idCurso}', [PizarraController::class, 'canvasModificado'])->name('pizarra.canvas_modificado');
+    Route::delete('/{curso}', [PizarraController::class, 'delete'])->name('pizarra.eliminar');
 });
 
+//Emitir Certificado
+Route::get('/emitir-certificados/{curso}', [CertificadoController::class, 'index'])->name('emitir_certificados');
 
+Route::post('/emitir-certificados/{curso}', [CertificadoController::class, 'imprimirCertificados'])->name('emitir_certificados.impresion');
+
+Route::post('/guardar-certificado', [CertificadoController::class, 'guardadoCertificado'])->name('emitir_certificados.guardado');
+
+//cerficado mail
+Route::post('/correo-certificado', [CertificadoController::class, 'correo_envio'])->name('correo_envio');

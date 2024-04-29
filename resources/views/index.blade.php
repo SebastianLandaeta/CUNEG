@@ -8,7 +8,10 @@
             
         </div>
         <div class="col-lg-6 mx-auto mt-4">
-            <p class="lead mb-4">Guiados por la experiencia de Kelvin Cárima y la asesoría de Ana Huamán, nuestro equipo de estudiantes de Ingeniería en Informática - Ednoweri Anselmi, Marco Cardenas, Sebastián Landaeta y Víctor Díaz - busca proporcionar una herramienta efectiva que beneficie a estudiantes, profesores y personal administrativo en la UNEG.</p>
+            <p class="lead mb-4">Guiados por la experiencia de Kelvin Cárima y la asesoría de Ana Huamán,
+                nuestro equipo de estudiantes de Ingeniería en Informática
+                - busca proporcionar una herramienta efectiva que beneficie a estudiantes, 
+                profesores y personal administrativo en la UNEG.</p>
         </div>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                 <a href="{{ route('cursos') }}" class="btn btn-primary btn-lg px-4 gap-3">Menú de cursos</a>
