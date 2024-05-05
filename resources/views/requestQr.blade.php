@@ -1,6 +1,6 @@
 <x-layout>
     @section('title', 'Generar QR de consulta')
-    <h1 class="text-center">Pagina de prueba Generacion QR</h1>
+    <h1 class="text-center">Pagina de prueba Generación QR</h1>
 
     <div class="container">
     <h2 class="text-center mt-4">Generación QR Específica</h2>
@@ -81,6 +81,4 @@
             }
         }
     </script>
-
-
 </x-layout>
