@@ -34,14 +34,25 @@ class CursoController extends Controller
 
     public function destroy(Curso $curso)
     {
-        $curso->cursosParticipantes()->delete();
-        
-        Participante::whereDoesntHave('cursoParticipantes')->delete();
+        // Obtener los participantes asociados al curso que se está eliminando
+        $participantes = $curso->participantes()->get();
+
+        // Iterar sobre cada participante
+        foreach ($participantes as $participante) {
+            // Verificar si el participante está asociado a otro curso
+            if ($participante->cursos()->count() <= 1) {
+                // Si no está asociado a otro curso, eliminarlo
+                $curso->cursoParticipantes()->delete();
+                Participante::whereDoesntHave('cursoParticipantes')->delete();
+            } else {
+                // Si está asociado a otro curso, eliminar solo la relación con el curso actual
+                $participante->cursos()->detach($curso->id);
+            }
+        }
 
         $curso->delete();
 
         return redirect()->route('cursos');
-        
     }
 
     public function search(Request $request)
@@ -55,26 +66,25 @@ class CursoController extends Controller
 
 
     public function loadedList(Request $request,Curso $curso)
-    {  
+    {
+        $helper = new \App\Helpers\FileProcessing\FileProcessing();
 
-    $helper = new \App\Helpers\FileProcessing\FileProcessing();
+        if ($request->hasFile('documento')) {
+            $path = $request->file('documento')->getRealPath();
 
-    if ($request->hasFile('documento')) {
-        $path = $request->file('documento')->getRealPath();
-            
             $validFormats = ['xlsx', 'xls'];
             $extension = $request->file('documento')->getClientOriginalExtension();
-    
+
             if (in_array($extension, $validFormats)) {
                 $participantes = $helper->importOfParticipantes($path);
-            
+
                 if (count($participantes)<1) {
                     return redirect()->back()->withErrors(['error' => "El archivo para '{$curso->nombre}' está vacío o tiene estructura incorrecta"]);
                 }
-    
+
                 if ($helper->validateParticipantes($participantes) == false) {
                     return response()->view('DataError', compact('participantes'));
-                        
+
                 } else {
                     $helper->saveParticipantes($participantes, $curso);
                     return redirect()->route('cursos');
@@ -83,12 +93,13 @@ class CursoController extends Controller
                 return redirect()->back()->withErrors(['error' => "El archivo para '{$curso->nombre}' no está en una extension válida (xlsx o xls)."]);
             }
         }
+
         return redirect()->back()->withErrors(['error' => "No se seleccionó ningún archivo para el curso '{$curso->nombre}'"]);
     }
 
     public function downloadExcelExample()
     {
-        $rutaArchivo = storage_path('app\public\Listado-Ejemplo.xlsx'); 
+        $rutaArchivo = storage_path('app\public\Listado-Ejemplo.xlsx');
 
         return response()->download($rutaArchivo, 'Listado_Participantes.xlsx');
     }
@@ -103,10 +114,26 @@ class CursoController extends Controller
 
     public function deleteList(Curso $curso)
     {
-        $curso->participantes()->detach(); // Elimina los participantes asociados al curso
-        $curso->lista_cargada = false; // Actualiza el valor booleano
+        // Obtener los participantes asociados al curso que se está eliminando
+        $participantes = $curso->participantes()->get();
+
+        // Iterar sobre cada participante
+        foreach ($participantes as $participante) {
+            // Verificar si el participante está asociado a otro curso
+            if ($participante->cursos()->count() <= 1) {
+                // Si no está asociado a otro curso, eliminarlo
+                $curso->cursoParticipantes()->delete();
+                Participante::whereDoesntHave('cursoParticipantes')->delete();
+            } else {
+                // Si está asociado a otro curso, eliminar solo la relación con el curso actual
+                $participante->cursos()->detach($curso->id);
+            }
+        }
+
+        // Actualizar el estado de lista cargada del curso
+        $curso->lista_cargada = false;
         $curso->save();
 
-        return redirect()->back()->with('success', 'Lista cargada eliminada correctamente');
+        return redirect()->back()->with('success', 'Lista eliminada correctamente');
     }
 }

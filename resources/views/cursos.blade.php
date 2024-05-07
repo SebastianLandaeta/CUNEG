@@ -55,9 +55,10 @@
     <!-- Tabla con los cursos disponibles -->
     <table class="table table-bordered">
         <thead>
-        <tr>   
+        <tr>
             <th scope="col" class="text-center">ID</th>
-            <th scope="col" class="text-center">Nombre del Curso</th>
+            <th scope="col" class="text-center">Nombre del curso</th>
+            <th scope="col" class="text-center">Descripción</th>
             <th scope="col" class="text-center">Fecha de inicio</th>
             <th scope="col" class="text-center">Fecha de finalización</th>
             <th scope="col" class="text-center">Acciones sobre el curso</th>
@@ -66,24 +67,23 @@
         <tbody>
             @forelse ($cursos as $curso)
             <tr>
-                
                     <td class="align-middle text-center">{{ $curso->id }}</td>
                     <td class="align-middle text-center">{{ $curso->nombre }}</td>
+                    <td class="align-middle text-center">{{ $curso->descripcion }}</td>
                     <td class="align-middle text-center">{{ $curso->f_inicio }}</td>
                     <td class="align-middle text-center">{{ $curso->f_finalizacion }}</td>
-                
 
                 <td class="d-block">
                     <!-- Boton propiedades del curso-->
                     <div class="p-2">
                         <div class="dropdown">
                             <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Propiedades del Curso
+                                Propiedades del curso
                             </button>
                             <ul class="dropdown-menu">
                                 <li>
                                     <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#{{'ModalMod'.$curso->id}}">
-                                        Modificar Curso
+                                        Modificar curso
                                     </a>
                                 </li>
 
@@ -152,7 +152,7 @@
                             </form>
                         </div>
                     @endcomponent
-                
+
                 <!-- Boton propiedades del listado de participantes-->
                 <div class="p-2">
                     <div class="dropdown">
@@ -160,23 +160,23 @@
                             Listado de participantes
                         </button>
                         <ul class="dropdown-menu">
+                            @if (!$curso->lista_cargada)
                             <li>
                                 <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#{{'ModalDeCarga' . $curso->id}}">
-                                    @if (!$curso->lista_cargada)
                                         Cargar lista
-                                    @else
-                                        Actualizar lista
-                                    @endif
                                 </a>
                             </li>
-
-                            @if ($curso->lista_cargada)
+                            @else
                                 <li>
                                     <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#{{'ModalDeListado' . $curso->id}}">
-                                        Lista cargada
+                                        Ver lista
                                     </a>
                                 </li>
-
+                                <li>
+                                    <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#{{'ModalDeCarga' . $curso->id}}">
+                                        Actualizar lista
+                                    </a>
+                                </li>
                                 <li>
                                     <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#{{'ModalDeEliminacionParticipantes' . $curso->id}}">
                                         Eliminar lista
@@ -234,33 +234,31 @@
                     @if (!$curso->lista_cargada)
                         @slot('ModalTitle', 'Carga de listado de participantes')
                     @else
-                        @slot('ModalTitle', 'Actualizacion de listado de participantes')
+                        @slot('ModalTitle', 'Actualización de listado de participantes')
                     @endif
                         @slot('ModalId', 'ModalDeCarga' . $curso->id )
                         @slot('ModalLabel', 'ModalCargaLabel' . $curso->id )
                         @slot('ModalSize', 'modal-dialog')
-
 
                         <div class="modal-body">
                             <form action="{{ route('curso.loadedList', $curso) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <p class="text-center pt-2"><b>A considerar: </b><p>
                                     <ul>
-                                        <li>Verifique que su excel este con la estructura correcta.</li>
-                                        <li>Para saber cual es la estructura correcta para cargar los participantes descargue el <b>Modelo Excel</b>.</li>
-                                        <li>Al momento de llenar el listado no subraye ni altere nada de la tipografia por defecto del Excel.</li>
-                                        <li>Si un participante es registrado nuevamente desde cualquier listado de cualquier curso, sus datos personales se actualizaran segun la nueva lista.</li>
+                                        <li>Verifique que su Excel tenga la estructura correcta.</li>
+                                        <li>Para saber cual es la estructura correcta para cargar los participantes descargue el <b><a id="excelLink" href="{{ route('d-excel') }}">Modelo Excel</a></b>.</li>
+                                        <li>Al momento de llenar el listado no subraye ni altere nada de la tipografía por defecto del Excel.</li>
+                                        <li>Si un participante es registrado nuevamente desde cualquier listado de cualquier curso, sus datos personales se actualizarán según la nueva lista.</li>
                                     </ul>
                                 <div class="clo-md-6 pb-2">
                                     <input class="form-control" type="file" name="documento" accept=".xls, .xlsx">
                                 </div>
 
                                 <div class="clo-md-6 d-flex align-items-center justify-content-center">
-                                    <a href="{{ route('d-excel') }}" class="btn btn-outline-secondary m-2">Modelo Excel</a>
                                     <button class="btn btn-outline-primary m-2" type="submit">Importar Lista</button>
                                 </div>
-
                             </form>
+                            <script src="{{ asset('js/excelForm.js') }}"></script>
                         </div>
                 @endcomponent
 
@@ -291,17 +289,15 @@
                                 Diseño de certificado
                             </button>
                             <ul class="dropdown-menu">
-                                
                                     <li>
                                         <a href="{{route('pizarra.index', ['curso' => $curso])}}" class="dropdown-item">
                                             Crear diseño nuevo
                                         </a>
                                     </li>
-                                    
                                     @if($curso->certificado_cargado)
                                         <li>
                                             <a href="#" class="dropdown-item item_visualizacion"  data-id="{{ $curso->id }}" data-bs-toggle="modal" data-bs-target="#{{'Pizarra' . $curso->id}}">
-                                                Visualizar diseño
+                                                Ver diseño
                                             </a>
                                         </li>
 
@@ -324,7 +320,7 @@
                     </div>
                 </td>
             </tr>
-            
+
             <!--Modal para VISUALIZAR diseño de certificado-->
             @component('components.modal')
                 @slot('ModalTitle', 'Visualizacion de pizarra')
@@ -394,5 +390,4 @@
         })
         .catch(error => console.error('Error al obtener los datos de la pizarra:', error));
     }
-
 </script>
