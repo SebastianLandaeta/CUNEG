@@ -15,7 +15,7 @@
                             <button id="btnRectangulo" type="button" class="btn btn-primary">Rectángulo</button>
                             <button id="btnCirculo" type="button" class="btn btn-primary">Círculo</button>
                         </div>
-                        
+
                         <!-- Botón para insertar formas especiales (nombre del participante/cedula/correo/codigo qr) -->
                         <div class="btn-group me-2" role="group" aria-label="Insertar formas">
                             <button id="btnInsertarQR" type="button" class="btn btn-success">Código QR</button>
@@ -33,10 +33,10 @@
                             @slot('ModalLabel', 'Insertar_texto_label' )
                             @slot('ModalSize', 'modal-dialog')
                             <div class="modal-body">
-                                Los datos de los participantes van entre "<>" para ser reemplazados al momento de emitirse los certificados 
+                                Los datos de los participantes van entre "<>" para ser reemplazados al momento de emitirse los certificados
                                 ejemplo "&lt;nombre&gt;", "&lt;apellido&gt;" etc...
                                 <br>
-                                Elementos especiales: nombre,apellido,cedula,email.
+                                Elementos especiales: nombre, apellido, cedula, email.
                                 <div class="m-3">
                                     <label for="text_input" class="form-label">Texto: </label>
                                     <input type="text" class="form-control" name="text_input" required>
@@ -63,13 +63,13 @@
                     <!-- Formulario para guardar la imagen -->
                     <form id="formGuardarImagen" action="{{ route('pizarra.guardar', ['curso' => $curso]) }}" method="POST" >
                         @csrf <!-- Agregar el token CSRF -->
-                        
+
                         <input type="hidden" name="formasSimples" id="formasSimples">
-                        
+
                         <input type="hidden" name="formasEspeciales" id="formasEspeciales">
 
                         <input type="hidden" name="canvasDimensions" id="canvasDimensions">
-                        
+
                         <button type="button" id="btnGuardarImagen" class="btn btn-primary d-block mx-auto mt-3">Guardar Imagen</button>
                     </form>
 
@@ -103,7 +103,7 @@
 
         // Llenar el campo oculto con las dimensiones del canvas en formato JSON
         document.getElementById('canvasDimensions').value = canvasDimensionsJSON;
-                
+
         // Agregar un rectángulo blanco al canvas (bloqueado)
         var fondoBlanco = new fabric.Rect({
             left: 0,
@@ -177,7 +177,7 @@
                             lockScalingFlip: true, // Especifica el tipo de letra aquí
                         });
                 }
-                
+
                 if (forma) {
                     canvas.add(forma);
                     canvas.renderAll();
@@ -262,7 +262,7 @@
                                 canvasTemp.height = imgObj.height;
                                 context.drawImage(imgObj, 0, 0);
                                 var base64Data = canvasTemp.toDataURL('image/png');
-                                
+
                                 // Crear un objeto de imagen en Fabric.js y agregarlo al lienzo
                                 var fabricImg = new fabric.Image(imgObj, {
                                     type: 'imagen',
@@ -373,7 +373,7 @@
             // Llenar los campos ocultos del formulario con los datos a enviar
             document.getElementById('formasSimples').value = JSON.stringify(formasSimples);
             document.getElementById('formasEspeciales').value = JSON.stringify(formasEspeciales);
-            
+
             console.log(canvasDimensionsJSON);
 
             const jsonString = JSON.stringify(formasSimples, null, 4); // Usa 4 espacios para la sangría

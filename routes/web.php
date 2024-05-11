@@ -6,22 +6,12 @@ use App\Http\Controllers\CursoController;
 use App\Http\Controllers\PizarraController;
 use App\Http\Controllers\CertificadoController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-//Inicio
+// Inicio
 Route::get('/', function () {
     return view('index');
 })->name('index');
 
-// Curso 
+// Curso
 Route::get('/cursos', [CursoController::class, 'index'])->name('cursos');
 
 Route::post('/cursos', [CursoController::class, 'store'])->name('cursos');
@@ -40,8 +30,7 @@ Route::get('curso/LoadList/{curso}', [CursoController::class, 'ExtractList'])->n
 
 Route::delete('/curso/{curso}/deleteList', [CursoController::class, 'deleteList'])->name('curso.deleteList');
 
-
-//QR 
+// QR
 Route::get('certificate_search_qr', [QrController::class, 'index'])->name('qr.search');
 
 Route::post('certificate_search_qr', [QrController::class, 'generateQr'])->name('qr.search.generate');
@@ -50,12 +39,11 @@ Route::post('qr_participant', [QrController::class, 'generarQrParticipante'])->n
 
 Route::get('certificate_search_qr/{cursoId}/{participanteId}', [QrController::class,'responseQr'])->name('qr_response');
 
-//Pizarra
+// Pizarra
 Route::prefix('pizarra')->group(function () {
-
     // Vista para el diseño de certificado
     Route::get('/crear/{curso}', [PizarraController::class, 'index'])->name('pizarra.index');
-    
+
     // Guardar el diseño del certificado
     Route::post('/{curso}', [PizarraController::class, 'guardar'])->name('pizarra.guardar');
 
@@ -66,12 +54,12 @@ Route::prefix('pizarra')->group(function () {
     Route::delete('/{curso}', [PizarraController::class, 'delete'])->name('pizarra.eliminar');
 });
 
-//Emitir Certificado
+// Emitir certificado
 Route::get('/emitir-certificados/{curso}', [CertificadoController::class, 'index'])->name('emitir_certificados');
 
 Route::post('/emitir-certificados/{curso}', [CertificadoController::class, 'imprimirCertificados'])->name('emitir_certificados.impresion');
 
 Route::post('/guardar-certificado', [CertificadoController::class, 'guardadoCertificado'])->name('emitir_certificados.guardado');
 
-//cerficado mail
+// Cerficado mail
 Route::post('/correo-certificado', [CertificadoController::class, 'correo_envio'])->name('correo_envio');

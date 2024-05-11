@@ -1,15 +1,15 @@
 <x-layout>
     @section('title', 'Emitir Certificados')
-    <h1 class="text-center">Emision de certificado: "{{$curso->nombre}}"</h1>
+    <h1 class="text-center">Emisión de certificado: "{{$curso->nombre}}"</h1>
 
     <div id="canvasContainer_{{$curso->id}}" class="container p-2" style="overflow-y: auto; max-height: 100vh;">
         <canvas id="previewCanvas_{{$curso->id}}" class="d-block mx-auto" width="800" height="600" style="border: 1px solid #ccc;"></canvas>
     </div>
 
     <h2 class="text-center p-2">Participantes: </h2>
-    <ul>    
+    <ul>
         @forelse ($curso->participantes as $participante)
-            <li><b>Nombre:</b> {{$participante->nombre}} - <b>Cedula</b>: {{$participante->cedula}} - {{$participante->email}}</li>
+            <li><b>Nombre:</b> {{$participante->nombre}} - <b>Cédula</b>: {{$participante->cedula}} - {{$participante->email}}</li>
         @empty
             <li>PROBLEMAS AL ACCEDER A ESTA VISTA SIN PARTICIPANTES, GESTIONAR BACKEND...</li>
         @endforelse

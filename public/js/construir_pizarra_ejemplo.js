@@ -1,4 +1,3 @@
-
 // Función para dibujar objetos en el canvas
 function dibujarObjetos(data, idCurso, ctx) {
     const canvas = document.getElementById('previewCanvas_' + idCurso);

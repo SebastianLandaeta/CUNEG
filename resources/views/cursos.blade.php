@@ -358,7 +358,6 @@
                 </tr>
             @endforelse
         </tbody>
-
     </table>
 
         <!-- Enlaces de paginación -->
