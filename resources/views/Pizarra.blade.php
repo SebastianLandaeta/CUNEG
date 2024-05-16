@@ -26,11 +26,11 @@
                             <button id="btnInsertarImagen" type="button" class="btn btn-warning">Insertar Imagen (PNG)</button>
                         </div>
 
-                        <!--Modal par insertar texto-->
+                        <!--Modal para insertar texto-->
                         @component('components.modal')
                             @slot('ModalTitle', 'Insertar texto')
                             @slot('ModalId', 'Insertar_texto')
-                            @slot('ModalLabel', 'Insertar_texto_label' )
+                            @slot('ModalLabel', 'Insertar_texto_label')
                             @slot('ModalSize', 'modal-dialog')
                             <div class="modal-body">
                                 Los datos de los participantes van entre "<>" para ser reemplazados al momento de emitirse los certificados
@@ -41,13 +41,28 @@
                                     <label for="text_input" class="form-label">Texto: </label>
                                     <input type="text" class="form-control" name="text_input" required>
                                 </div>
+                                <div class="m-3">
+                                <label for="font_select" class="form-label">Fuente: </label>
+                                    <select class="form-control" name="font_select">
+                                        <option value="Arial" style="font-family: Arial;">Arial</option>
+                                        <option value="Times New Roman" style="font-family: Times New Roman;">Times New Roman</option>
+                                        <option value="Courier New" style="font-family: Courier New;">Courier New</option>
+                                        <option value="Georgia" style="font-family: Georgia;">Georgia</option>
+                                        <option value="Verdana" style="font-family: Verdana;">Verdana</option>
+                                        <option value="Papyrus" style="font-family: Papyrus;">Papyrus</option>
+                                        <option value="Broadway" style="font-family: Broadway;">Broadway</option>
+                                    </select>
+                                </div>
+                                <div class="m-3">
+                                <label for="font_size" class="form-label">Tamaño de fuente: </label>
+                                    <input type="number" class="form-control" name="font_size" value="20" min="8" max="72" required>
+                                </div>
                             </div>
                             <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
-                                    <button id="btnGuardarTexto" type="button" class="btn btn-primary">Insertar texto</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
+                            <button id="btnGuardarTexto" type="button" class="btn btn-primary">Insertar texto</button>
                             </div>
                         @endcomponent
-
 
                         <!-- Eliminar objetos -->
                         <div class="btn-group me-2" role="group" aria-label="Eliminar forma">
@@ -219,26 +234,30 @@
         });
 
         var btnGuardarTexto = document.getElementById('btnGuardarTexto');
-            btnGuardarTexto.addEventListener('click', function() {
-                // Obtener el texto ingresado por el usuario desde el modal
-                var textoUsuario = document.querySelector('#Insertar_texto input[name="text_input"]').value;
 
-                // Crear un objeto de texto en el lienzo
-                var objetoTexto = new fabric.Text(textoUsuario, {
-                    type: 'text',
-                    left: 100, // Posición X inicial
-                    top: 100, // Posición Y inicial
-                    fontSize: 20, // Tamaño de fuente
-                    fill: 'black' // Color de texto
-                });
+        btnGuardarTexto.addEventListener('click', function() {
+            // Obtener el texto ingresado por el usuario desde el modal
+            var textoUsuario = document.querySelector('#Insertar_texto input[name="text_input"]').value;
+            var fuenteUsuario = document.querySelector('#Insertar_texto select[name="font_select"]').value;
+            var tamañoFuenteUsuario = document.querySelector('#Insertar_texto input[name="font_size"]').value;
 
-                // Agregar el objeto de texto al lienzo
-                canvas.add(objetoTexto);
-
-                // Cerrar el modal después de agregar el texto al lienzo
-                var modal = bootstrap.Modal.getInstance(document.getElementById('Insertar_texto'));
-                modal.hide();
+            // Crear un objeto de texto en el lienzo
+            var objetoTexto = new fabric.Text(textoUsuario, {
+                type: 'text',
+                left: 100, // Posición X inicial
+                top: 100, // Posición Y inicial
+                fontSize: parseInt(tamañoFuenteUsuario), // Tamaño de fuente
+                fill: 'black', // Color de texto
+                fontFamily: fuenteUsuario // Fuente seleccionada
             });
+
+            // Agregar el objeto de texto al lienzo
+            canvas.add(objetoTexto);
+
+            // Cerrar el modal después de agregar el texto al lienzo
+            var modal = bootstrap.Modal.getInstance(document.getElementById('Insertar_texto'));
+            modal.hide();
+        });
 
         // Agregar un event listener al botón de insertar imágenes
         var btnInsertarImagen = document.querySelector('#btnInsertarImagen');
@@ -281,7 +300,6 @@
             };
             input.click(); // Mostrar el selector de archivos
         });
-
 
         // Agregar un event listener al botón de guardar imagen
         var btnGuardarImagen = document.getElementById('btnGuardarImagen');
@@ -350,6 +368,7 @@
                             top: object.top,
                             texto: object.text,
                             fontSize: object.fontSize,
+                            font: object.fontFamily,
                             fill: object.fill,
                             angle: object.angle
                         });

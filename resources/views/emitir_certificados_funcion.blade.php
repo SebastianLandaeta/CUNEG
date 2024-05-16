@@ -18,20 +18,19 @@
     <canvas id="canvas" ></canvas>
 
 <script>
-        
         var correosEnviados=0;
         document.addEventListener("DOMContentLoaded", function() {
             var canvas = document.getElementById('canvas');
             var ctx = canvas.getContext('2d');
 
-            var listaParticipantes = {!! json_encode($curso->participantes) !!}; 
+            var listaParticipantes = {!! json_encode($curso->participantes) !!};
             var cursoId = {!!  $curso->id !!}
             var curso = {!! $curso !!}
-            
+
 
             canvas.width =  {!! $data->dimensionesCanvas->width !!};
             canvas.height = {!! $data->dimensionesCanvas->height !!};
-            
+
             // Función para dibujar los objetos en el canvas
             async function dibujarCertificados() {
                 // Iterar sobre la lista de participantes
@@ -148,7 +147,7 @@
 
                 // Configurar el estilo de texto
                 ctx.fillStyle = objeto.fill;
-                ctx.font = objeto.fontSize + "px Arial"; // Establecer el tamaño y el tipo de fuente
+                ctx.font = objeto.fontSize + "px " + objeto.font; // Establecer el tamaño y el tipo de fuente
 
                 // Alinear el texto según el centro
                 //ctx.textAlign = "center";
@@ -168,7 +167,7 @@
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        body: JSON.stringify({ 
+                        body: JSON.stringify({
                             idCurso: idCurso,
                             cedula: cedula,
                             anchoQR: size
@@ -192,7 +191,7 @@
                     });
                 });
             }
-            
+
             function dibujarImagenPNG(objeto) {
                 ctx.save();
                 var img = new Image();
@@ -217,7 +216,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': token
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         image: dataURL,
                         cedulaParticipante: cedulaParticipante,
                         idCurso: idCurso
@@ -239,7 +238,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': token
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         participante: participante,
                         curso: curso,
                     })
@@ -250,7 +249,7 @@
                 .catch(error => {
                     mostrarMensajeError('Error al fetch de enviarCorreo ' + error);
                 });
-            } 
+            }
 
             async function enviarCorreosATodos(){
                 for (let i = 0; i < listaParticipantes.length; i++) {
@@ -267,8 +266,6 @@
                 .catch(error => {
                     mostrarMensajeError('Error al fetch de dibujarCertificados ' + error);
                 });
-
-            
     });
 
     function mostrarMensajeExitoYCerrarVentana() {
@@ -310,9 +307,6 @@
         // Agregar el mensaje de error al cuerpo del documento
         document.body.appendChild(alertaElement);
     }
-
-
-
     </script>
 </body>
 </html>

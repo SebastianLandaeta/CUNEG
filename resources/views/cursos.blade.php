@@ -277,7 +277,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
-                            <button type="submit" class="btn btn-danger">Eliminar Lista</button>
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
                         </form>
                     </div>
                 @endcomponent
@@ -303,7 +303,7 @@
 
                                         <li>
                                             <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#{{'ModalDeEliminacionCertificado' . $curso->id}}">
-                                                Eliminar diseño
+                                                Eliminar
                                             </a>
                                         </li>
                                     @endif
@@ -323,7 +323,7 @@
 
             <!--Modal para VISUALIZAR diseño de certificado-->
             @component('components.modal')
-                @slot('ModalTitle', 'Visualizacion de pizarra')
+                @slot('ModalTitle', 'Visualización de pizarra')
                 @slot('ModalId', 'Pizarra' . $curso->id )
                 @slot('ModalLabel', 'PizarraLabel' . $curso->id )
                 @slot('ModalSize', 'modal-dialog modal-xl modal-dialog-centered')
@@ -347,7 +347,7 @@
                         @csrf
                         @method('DELETE')
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
-                        <button type="submit" class="btn btn-danger">Eliminar Lista</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
                     </form>
                 </div>
             @endcomponent

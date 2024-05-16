@@ -67,7 +67,7 @@ function dibujarTexto(ctx, objeto) {
     ctx.translate(objeto.left, objeto.top);
     ctx.rotate((objeto.angle * Math.PI) / 180);
     ctx.fillStyle = objeto.fill;
-    ctx.font = objeto.fontSize + "px Arial";
+    ctx.font = objeto.fontSize + "px " + objeto.font;
     ctx.fillText(objeto.texto, 0, 0 + objeto.fontSize);
     ctx.restore();
 }

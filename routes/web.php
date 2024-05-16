@@ -47,7 +47,7 @@ Route::prefix('pizarra')->group(function () {
     // Guardar el diseño del certificado
     Route::post('/{curso}', [PizarraController::class, 'guardar'])->name('pizarra.guardar');
 
-    //Visualizar certificado
+    // Visualizar certificado
     Route::get('/visualizar_curso', [PizarraController::class, 'visualizarPizarra'])->name('pizarra.visualizar');
 
     // Eliminar el diseño del certificado
