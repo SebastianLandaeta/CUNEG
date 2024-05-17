@@ -57,6 +57,10 @@
                                 <label for="font_size" class="form-label">Tamaño de fuente: </label>
                                     <input type="number" class="form-control" name="font_size" value="20" min="8" max="72" required>
                                 </div>
+                                <div class="m-3">
+                                    <label for="font_color" class="form-label">Color de fuente: </label>
+                                    <input type="color" class="form-control" name="font_color" value="#000000" required>
+                                </div>
                             </div>
                             <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
@@ -240,6 +244,7 @@
             var textoUsuario = document.querySelector('#Insertar_texto input[name="text_input"]').value;
             var fuenteUsuario = document.querySelector('#Insertar_texto select[name="font_select"]').value;
             var tamañoFuenteUsuario = document.querySelector('#Insertar_texto input[name="font_size"]').value;
+            var colorFuenteUsuario = document.querySelector('#Insertar_texto input[name="font_color"]').value;
 
             // Crear un objeto de texto en el lienzo
             var objetoTexto = new fabric.Text(textoUsuario, {
@@ -247,7 +252,7 @@
                 left: 100, // Posición X inicial
                 top: 100, // Posición Y inicial
                 fontSize: parseInt(tamañoFuenteUsuario), // Tamaño de fuente
-                fill: 'black', // Color de texto
+                fill: colorFuenteUsuario, // Color de texto
                 fontFamily: fuenteUsuario // Fuente seleccionada
             });
 
