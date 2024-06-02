@@ -12,10 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('participantes', function (Blueprint $table) {
-            $table->integer('cedula')->primary();
+            $table->string('tipo_documento'); 
+            $table->string('numero_documento'); 
             $table->string('nombre');
             $table->string('apellido');
             $table->string('email')->unique();
+            $table->primary(['tipo_documento', 'numero_documento']); // Clave primaria compuesta
         });
     }
 

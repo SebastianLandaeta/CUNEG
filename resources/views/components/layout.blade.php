@@ -22,7 +22,7 @@
 
             <ul class="nav nav-pills">
                 <li class="nav-item"><a href="{{ route('index') }}" class="nav-link" aria-current="page">Inicio</a></li>
-                <li class="nav-item"><a href="{{ route('cursos') }}" class="nav-link">Cursos</a></li>
+                <li class="nav-item"><a href="{{ route('cursos.index') }}" class="nav-link">Cursos</a></li>
                 <li class="nav-item"><a href="{{ route('qr.search') }}" class="nav-link">Consulta de Certificado</a></li>
                 <!--<li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>

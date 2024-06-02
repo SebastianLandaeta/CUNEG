@@ -6,15 +6,23 @@ use App\Http\Controllers\CursoController;
 use App\Http\Controllers\PizarraController;
 use App\Http\Controllers\CertificadoController;
 
+//prueba
+use App\Http\Controllers\ParticipanteController;
+
 // Inicio
 Route::get('/', function () {
     return view('index');
 })->name('index');
 
-// Curso
-Route::get('/cursos', [CursoController::class, 'index'])->name('cursos');
+Route::prefix('cursos')->group(function () {
+    Route::get('/', [CursoController::class, 'index'])->name('cursos.index');
+    Route::post('/', [CursoController::class, 'create'])->name('cursos.create');
+});
 
-Route::post('/cursos', [CursoController::class, 'store'])->name('cursos');
+// Curso
+//Route::get('/cursos', [CursoController::class, 'index'])->name('cursos');
+
+//Route::post('/cursos', [CursoController::class, 'store'])->name('cursos');
 
 Route::put('cursos/{curso}', [CursoController::class, 'update'])->name('cursos.update');
 
@@ -63,3 +71,8 @@ Route::post('/guardar-certificado', [CertificadoController::class, 'guardadoCert
 
 // Cerficado mail
 Route::post('/correo-certificado', [CertificadoController::class, 'correo_envio'])->name('correo_envio');
+
+
+
+Route::get('participantes/create', [ParticipanteController::class, 'create'])->name('participantes.create');
+Route::post('participantes', [ParticipanteController::class, 'store'])->name('participantes.store');

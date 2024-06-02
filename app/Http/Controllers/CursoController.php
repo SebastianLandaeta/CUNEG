@@ -17,42 +17,46 @@ class CursoController extends Controller
         return view('cursos', ['cursos' => $cursos]);
     }
 
-    public function store(Request $request)
+    public function create(Request $request)
     {
-        $curso = $request->only(['nombre', 'descripcion', 'f_inicio', 'f_finalizacion']);
-
+        $curso = $request->only(['nombre', 'descripcion', 'f_inicio', 'f_finalizacion', 'horas_academicas']);
         Curso::create($curso);
-
-        return redirect()->route('cursos');
+        return redirect()->route('cursos.index');
     }
 
     public function update(Request $request, Curso $curso)
     {
-        $curso->update($request->only(['nombre', 'descripcion', 'f_inicio', 'f_finalizacion']));
-        return redirect()->route('cursos');
+        $curso->update($request->only(['nombre', 'descripcion', 'f_inicio', 'f_finalizacion', 'horas_academicas']));
+        return redirect()->route('cursos.index');
     }
 
     public function destroy(Curso $curso)
     {
         // Obtener los participantes asociados al curso que se está eliminando
-        $participantes = $curso->participantes()->get();
-
+        $participantes = $curso->cursoParticipantes()->get();
+    
         // Iterar sobre cada participante
-        foreach ($participantes as $participante) {
+        foreach ($participantes as $cursoParticipante) {
+            // Acceder al participante a través del modelo CursoParticipante
+            $participante = $cursoParticipante->participante;
+    
             // Verificar si el participante está asociado a otro curso
             if ($participante->cursos()->count() <= 1) {
-                // Si no está asociado a otro curso, eliminarlo
-                $curso->cursoParticipantes()->delete();
-                Participante::whereDoesntHave('cursoParticipantes')->delete();
+                // Si no está asociado a otro curso, eliminar el participante
+                $participante->delete();
             } else {
                 // Si está asociado a otro curso, eliminar solo la relación con el curso actual
                 $participante->cursos()->detach($curso->id);
             }
         }
-
+    
+        // Eliminar los registros de la tabla intermedia
+        $curso->cursoParticipantes()->delete();
+    
+        // Finalmente, eliminar el curso
         $curso->delete();
-
-        return redirect()->route('cursos');
+    
+        return redirect()->route('cursos.index');
     }
 
     public function search(Request $request)

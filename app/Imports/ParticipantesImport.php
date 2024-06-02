@@ -25,9 +25,6 @@ class ParticipantesImport implements ToModel, WithHeadingRow
         } 
     }
 
-
-
-
     public function getParticipantes()
     {
         return $this->participantes; 

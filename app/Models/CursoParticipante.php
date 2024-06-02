@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -7,23 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class CursoParticipante extends Model
 {
-    use HasFactory;
+    use \Awobaz\Compoships\Compoships;
 
-    protected $table = "cursoParticipantes";
+    protected $table = 'curso_participantes';
 
-    protected $fillable = ['rol'];
+    protected $fillable = ['curso_id', 'participante_tipo_documento', 'participante_numero_documento', 'rol'];
+
     public $timestamps = false;
 
-    // Define la relación con la tabla 'participantes'
     public function participante()
     {
-        return $this->belongsTo(Participante::class, 'participante_fk', 'cedula');
+        return $this->belongsTo(Participante::class, ['participante_tipo_documento', 'participante_numero_documento'], ['tipo_documento', 'numero_documento']);
     }
 
-    // Define la relación con la tabla 'cursos'
     public function curso()
     {
-        return $this->belongsTo(Curso::class, 'curso_fk', 'id');
+        return $this->belongsTo(Curso::class, 'curso_id');
     }
 }
-
