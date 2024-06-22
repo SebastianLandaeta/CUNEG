@@ -23,7 +23,7 @@
       </div>
       <div class="modal-body">
         {{ $slot }}
-    </div>
+      </div>
     </div>
   </div>
 </div>

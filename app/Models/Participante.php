@@ -34,14 +34,9 @@ class Participante extends Model
 
         return $query;
     }
+    
 
-    public function cursos()
-    {
-        return $this->belongsToMany(Curso::class, 'curso_participantes', 'participante_numero_documento', 'curso_id')
-                    ->withPivot('rol', 'participante_tipo_documento');
-    }
-
-    public function cursoParticipantes()
+    public function cursoParticipante()
     {
         return $this->hasMany(CursoParticipante::class, ['participante_tipo_documento', 'participante_numero_documento'], ['tipo_documento', 'numero_documento']);
     }

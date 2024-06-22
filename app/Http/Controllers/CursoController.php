@@ -2,20 +2,28 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Helpers\ProcesarParticipantes;
 use App\Exports\ParticipantsExport;
 use App\Http\Controllers\Controller;
 use App\Models\Curso;
 use App\Models\Participante;
+use App\Models\CursoParticipante;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Excel;
+
 
 class CursoController extends Controller
 {
     public function index()
     {
-        $cursos = Curso::simplePaginate(8);
-        return view('cursos', ['cursos' => $cursos]);
+        
+        $cursos = Curso::with(['cursoParticipantes', 'cursoParticipantes.participante'])
+        ->simplePaginate(8);
+
+        return view('cursos', compact('cursos'));
     }
+
 
     public function create(Request $request)
     {
@@ -41,12 +49,15 @@ class CursoController extends Controller
             $participante = $cursoParticipante->participante;
     
             // Verificar si el participante está asociado a otro curso
-            if ($participante->cursos()->count() <= 1) {
+            if ($participante->cursoParticipante()->count() <= 1) {
                 // Si no está asociado a otro curso, eliminar el participante
                 $participante->delete();
             } else {
                 // Si está asociado a otro curso, eliminar solo la relación con el curso actual
-                $participante->cursos()->detach($curso->id);
+                CursoParticipante::where('curso_id', $curso->id)
+                ->where('participante_tipo_documento', $participante->tipo_documento)
+                ->where('participante_numero_documento', $participante->numero_documento)
+                ->delete();
             }
         }
     
@@ -69,10 +80,8 @@ class CursoController extends Controller
     }
 
 
-    public function loadedList(Request $request,Curso $curso)
+    public function loadList(Request $request, Curso $curso)
     {
-        $helper = new \App\Helpers\FileProcessing\FileProcessing();
-
         if ($request->hasFile('documento')) {
             $path = $request->file('documento')->getRealPath();
 
@@ -80,26 +89,73 @@ class CursoController extends Controller
             $extension = $request->file('documento')->getClientOriginalExtension();
 
             if (in_array($extension, $validFormats)) {
-                $participantes = $helper->importOfParticipantes($path);
+                $participantes = ProcesarParticipantes::importOfParticipantes($path);
 
-                if (count($participantes)<1) {
+                if (count($participantes) < 1) {
                     return redirect()->back()->withErrors(['error' => "El archivo para '{$curso->nombre}' está vacío o tiene estructura incorrecta"]);
                 }
 
-                if ($helper->validateParticipantes($participantes) == false) {
-                    return response()->view('DataError', compact('participantes'));
+                $validationResults = ProcesarParticipantes::validateParticipantes($participantes);
 
-                } else {
-                    $helper->saveParticipantes($participantes, $curso);
-                    return redirect()->route('cursos');
-                }
+                $invalidParticipants = $validationResults['invalid'];
+                $validParticipants = $validationResults['valid'];
+
+                // Guardar participantes válidos
+                $saveResults = ProcesarParticipantes::saveParticipantes($validParticipants, $curso);
+
+                // Redirigir a la vista de resultados
+                return view('ParticipantesResult', [
+                    'newParticipants' => $saveResults['new'],
+                    'updatedParticipants' => $saveResults['updated'],
+                    'failedParticipants' => $saveResults['failed'],
+                    'invalidParticipants' => $invalidParticipants
+                ]);
             } else {
-                return redirect()->back()->withErrors(['error' => "El archivo para '{$curso->nombre}' no está en una extension válida (xlsx o xls)."]);
+                return redirect()->back()->withErrors(['error' => "El archivo para '{$curso->nombre}' no está en una extensión válida (xlsx o xls)."]);
             }
         }
 
         return redirect()->back()->withErrors(['error' => "No se seleccionó ningún archivo para el curso '{$curso->nombre}'"]);
     }
+
+    public function addParticipante(Request $request, Curso $curso)
+    {
+        $validatedData = $request->validate([
+            'tipo_documento' => 'required',
+            'numero_documento' => 'required',
+            'nombre' => 'required',
+            'apellido' => 'required',
+            'email' => 'required|email',
+            'rol' => 'required',
+        ]);
+
+        // Verificar si el participante ya existe
+        $participante = Participante::firstOrCreate([
+            'tipo_documento' => $validatedData['tipo_documento'],
+            'numero_documento' => $validatedData['numero_documento']
+        ], [
+            'nombre' => $validatedData['nombre'],
+            'apellido' => $validatedData['apellido'],
+            'email' => $validatedData['email']
+        ]);
+
+        // Eliminar relación previa si existe
+        CursoParticipante::where('curso_id', $curso->id)
+            ->where('participante_tipo_documento', $participante->tipo_documento)
+            ->where('participante_numero_documento', $participante->numero_documento)
+            ->delete();
+
+        // Asociar el participante al curso con la nueva relación
+        CursoParticipante::create([
+            'curso_id' => $curso->id,
+            'participante_tipo_documento' => $participante->tipo_documento,
+            'participante_numero_documento' => $participante->numero_documento,
+            'rol' => $validatedData['rol']
+        ]);
+
+        return redirect()->back()->with('success', 'Participante agregado correctamente.');
+    }
+
 
     public function downloadExcelExample()
     {
@@ -116,28 +172,37 @@ class CursoController extends Controller
         return $excel->download(new ParticipantsExport($curso->id), $fileName);
     }
 
-    public function deleteList(Curso $curso)
+    public function deleteSelectedParticipants(Request $request, Curso $curso)
     {
-        // Obtener los participantes asociados al curso que se está eliminando
-        $participantes = $curso->participantes()->get();
+        $participantes = $request->input('participantes', []);
 
-        // Iterar sobre cada participante
         foreach ($participantes as $participante) {
-            // Verificar si el participante está asociado a otro curso
-            if ($participante->cursos()->count() <= 1) {
-                // Si no está asociado a otro curso, eliminarlo
-                $curso->cursoParticipantes()->delete();
-                Participante::whereDoesntHave('cursoParticipantes')->delete();
-            } else {
-                // Si está asociado a otro curso, eliminar solo la relación con el curso actual
-                $participante->cursos()->detach($curso->id);
+            $participante = json_decode($participante, true);
+            $tipo_documento = $participante['tipo_documento'];
+            $numero_documento = $participante['numero_documento'];
+
+            // Eliminar la relación entre el curso y los participantes seleccionados
+            CursoParticipante::where([
+                ['curso_id', '=', $curso->id],
+                ['participante_tipo_documento', '=', $tipo_documento],
+                ['participante_numero_documento', '=', $numero_documento]
+            ])->delete();
+
+            // Verificar si el participante está asociado a otros cursos
+            $otrosCursos = CursoParticipante::where([
+                ['participante_tipo_documento', '=', $tipo_documento],
+                ['participante_numero_documento', '=', $numero_documento]
+            ])->exists();
+
+            // Si no está asociado a otros cursos, eliminar el participante
+            if (!$otrosCursos) {
+                Participante::where([
+                    ['tipo_documento', '=', $tipo_documento],
+                    ['numero_documento', '=', $numero_documento]
+                ])->delete();
             }
         }
 
-        // Actualizar el estado de lista cargada del curso
-        $curso->lista_cargada = false;
-        $curso->save();
-
-        return redirect()->back()->with('success', 'Lista eliminada correctamente');
+        return redirect()->back()->with('success', 'Participantes eliminados correctamente.');
     }
 }

@@ -15,12 +15,6 @@ class Curso extends Model
     {
         return $this->hasMany(CursoParticipante::class, 'curso_id', 'id');
     }
-
-    public function participantes()
-    {
-        return $this->belongsToMany(Participante::class, 'curso_participantes', 'curso_id', 'participante_numero_documento')
-                    ->withPivot('rol', 'participante_tipo_documento');
-    }
     
 
     public function certificado()

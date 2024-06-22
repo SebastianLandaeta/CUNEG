@@ -15,7 +15,7 @@
                 profesores y personal administrativo en la UNEG.</p>
         </div>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <a href="{{ route('cursos') }}" class="btn btn-primary btn-lg px-4 gap-3">Menú de cursos</a>
+                <a href="{{ route('cursos.index') }}" class="btn btn-primary btn-lg px-4 gap-3">Menú de cursos</a>
             </div>
     </div>
 </x-layout>

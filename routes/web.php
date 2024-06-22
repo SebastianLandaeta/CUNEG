@@ -14,9 +14,17 @@ Route::get('/', function () {
     return view('index');
 })->name('index');
 
+
 Route::prefix('cursos')->group(function () {
     Route::get('/', [CursoController::class, 'index'])->name('cursos.index');
     Route::post('/', [CursoController::class, 'create'])->name('cursos.create');
+
+    Route::put('/{curso}', [CursoController::class, 'update'])->name('cursos.update');
+    Route::delete('/{curso}', [CursoController::class, 'destroy'])->name('cursos.destroy');
+
+    Route::post('/cargarLista/{curso}', [CursoController::class, 'loadList'])->name('curso.loadList');
+    Route::delete('/deleteSelectedParticipants/{curso}', [CursoController::class, 'deleteSelectedParticipants'])->name('curso.deleteSelectedParticipants');
+    Route::post('/add-participante/{curso}', [CursoController::class, 'addParticipante'])->name('cursos.addParticipante');
 });
 
 // Curso
@@ -24,13 +32,10 @@ Route::prefix('cursos')->group(function () {
 
 //Route::post('/cursos', [CursoController::class, 'store'])->name('cursos');
 
-Route::put('cursos/{curso}', [CursoController::class, 'update'])->name('cursos.update');
-
-Route::delete('cursos/{curso}', [CursoController::class, 'destroy'])->name('cursos.destroy');
 
 Route::get('/cursos/buscar', [CursoController::class, 'search'])->name('cursos.search');
 
-Route::post('curso/LoadList/{curso}', [CursoController::class, 'loadedList'])->name('curso.loadedList');
+
 
 Route::get('/download-excel-example',[CursoController::class, 'downloadExcelExample'])->name('d-excel');
 
