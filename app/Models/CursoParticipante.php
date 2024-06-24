@@ -3,20 +3,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Curso;
 
 class CursoParticipante extends Model
 {
-    use \Awobaz\Compoships\Compoships;
+    use HasFactory;
 
     protected $table = 'curso_participantes';
 
-    protected $fillable = ['curso_id', 'participante_tipo_documento', 'participante_numero_documento', 'rol'];
+    protected $fillable = [
+        'curso_id',
+        'participante_id', // Actualizamos para usar la nueva clave primaria
+        'rol'
+    ];
 
     public $timestamps = false;
 
     public function participante()
     {
-        return $this->belongsTo(Participante::class, ['participante_tipo_documento', 'participante_numero_documento'], ['tipo_documento', 'numero_documento']);
+        return $this->belongsTo(Participante::class, 'participante_id');
     }
 
     public function curso()

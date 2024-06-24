@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -6,38 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Participante extends Model
 {
-    use \Awobaz\Compoships\Compoships;
-    
-    public $incrementing = false; // Las claves compuestas no son autoincrementales
+    use HasFactory;
+
     public $timestamps = false;
-    protected $primaryKey = ['tipo_documento', 'numero_documento'];
-    protected $keyType = 'string'; // Ajusta esto si tus claves son enteros
 
     protected $fillable = [
         'tipo_documento',
         'numero_documento',
         'nombre',
         'apellido',
-        'email',
+        'email'
     ];
 
-    protected function setKeysForSaveQuery($query)
+    protected $primaryKey = 'id'; // Establece la clave primaria en la columna 'id'
+    public function cursos()
     {
-        $keys = $this->getKeyName();
-        if (!is_array($keys)) {
-            return parent::setKeysForSaveQuery($query);
-        }
-
-        foreach ($keys as $key) {
-            $query->where($key, '=', $this->getAttribute($key));
-        }
-
-        return $query;
+        return $this->belongsToMany(Curso::class, 'curso_participantes', 'participante_id', 'curso_id')
+                    ->withPivot('rol');
     }
+
     
-
-    public function cursoParticipante()
-    {
-        return $this->hasMany(CursoParticipante::class, ['participante_tipo_documento', 'participante_numero_documento'], ['tipo_documento', 'numero_documento']);
-    }
 }

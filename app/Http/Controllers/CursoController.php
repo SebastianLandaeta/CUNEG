@@ -17,10 +17,7 @@ class CursoController extends Controller
 {
     public function index()
     {
-        
-        $cursos = Curso::with(['cursoParticipantes', 'cursoParticipantes.participante'])
-        ->simplePaginate(8);
-
+        $cursos = Curso::with(['participantes'])->simplePaginate(8);
         return view('cursos', compact('cursos'));
     }
 
@@ -41,35 +38,27 @@ class CursoController extends Controller
     public function destroy(Curso $curso)
     {
         // Obtener los participantes asociados al curso que se está eliminando
-        $participantes = $curso->cursoParticipantes()->get();
+        $participantes = $curso->participantes()->get();
     
         // Iterar sobre cada participante
-        foreach ($participantes as $cursoParticipante) {
-            // Acceder al participante a través del modelo CursoParticipante
-            $participante = $cursoParticipante->participante;
+        foreach ($participantes as $participante) {
+            // Eliminar la relación entre el curso y el participante en la tabla intermedia
+            $curso->participantes()->detach($participante->id);
     
-            // Verificar si el participante está asociado a otro curso
-            if ($participante->cursoParticipante()->count() <= 1) {
+            // Verificar si el participante está asociado a otros cursos
+            if ($participante->cursos()->count() == 0) {
                 // Si no está asociado a otro curso, eliminar el participante
                 $participante->delete();
-            } else {
-                // Si está asociado a otro curso, eliminar solo la relación con el curso actual
-                CursoParticipante::where('curso_id', $curso->id)
-                ->where('participante_tipo_documento', $participante->tipo_documento)
-                ->where('participante_numero_documento', $participante->numero_documento)
-                ->delete();
             }
         }
     
-        // Eliminar los registros de la tabla intermedia
-        $curso->cursoParticipantes()->delete();
-    
-        // Finalmente, eliminar el curso
+        // Eliminar el curso
         $curso->delete();
     
-        return redirect()->route('cursos.index');
+        return redirect()->route('cursos.index')->with('success', 'Curso y participantes asociados eliminados correctamente.');
     }
-
+    
+    
     public function search(Request $request)
     {
         $terminoBusqueda = $request->input('buscar');
@@ -118,43 +107,54 @@ class CursoController extends Controller
         return redirect()->back()->withErrors(['error' => "No se seleccionó ningún archivo para el curso '{$curso->nombre}'"]);
     }
 
+  
     public function addParticipante(Request $request, Curso $curso)
     {
         $validatedData = $request->validate([
-            'tipo_documento' => 'required',
-            'numero_documento' => 'required',
-            'nombre' => 'required',
-            'apellido' => 'required',
-            'email' => 'required|email',
-            'rol' => 'required',
+            'tipo_documento' => 'required|string|max:255',
+            'numero_documento' => 'required|string|max:255',
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'rol' => 'required|string|max:255',
         ]);
-
+    
         // Verificar si el participante ya existe
-        $participante = Participante::firstOrCreate([
-            'tipo_documento' => $validatedData['tipo_documento'],
-            'numero_documento' => $validatedData['numero_documento']
-        ], [
-            'nombre' => $validatedData['nombre'],
-            'apellido' => $validatedData['apellido'],
-            'email' => $validatedData['email']
-        ]);
-
-        // Eliminar relación previa si existe
-        CursoParticipante::where('curso_id', $curso->id)
-            ->where('participante_tipo_documento', $participante->tipo_documento)
-            ->where('participante_numero_documento', $participante->numero_documento)
-            ->delete();
-
-        // Asociar el participante al curso con la nueva relación
+        $participante = Participante::where('tipo_documento', $validatedData['tipo_documento'])
+            ->where('numero_documento', $validatedData['numero_documento'])
+            ->first();
+    
+        if ($participante) {
+            // Verificar si ya está asociado al curso
+            $existsInCurso = CursoParticipante::where('curso_id', $curso->id)
+                ->where('participante_id', $participante->id)
+                ->exists();
+    
+            if ($existsInCurso) {
+                $errorMessage = "El participante {$participante->tipo_documento}-{$participante->numero_documento}, {$participante->nombre} {$participante->apellido}  ya está registrado en el curso {$curso->nombre}.";
+                return redirect()->back()->withErrors(['error' => $errorMessage])->withInput();
+            }
+        } else {
+            // Crear el participante si no existe
+            $participante = Participante::create([
+                'tipo_documento' => $validatedData['tipo_documento'],
+                'numero_documento' => $validatedData['numero_documento'],
+                'nombre' => $validatedData['nombre'],
+                'apellido' => $validatedData['apellido'],
+                'email' => $validatedData['email'],
+            ]);
+        }
+    
+        // Asociar el participante al curso con el nuevo rol
         CursoParticipante::create([
             'curso_id' => $curso->id,
-            'participante_tipo_documento' => $participante->tipo_documento,
-            'participante_numero_documento' => $participante->numero_documento,
-            'rol' => $validatedData['rol']
+            'participante_id' => $participante->id,
+            'rol' => $validatedData['rol'],
         ]);
-
+    
         return redirect()->back()->with('success', 'Participante agregado correctamente.');
     }
+    
 
 
     public function downloadExcelExample()
@@ -164,45 +164,33 @@ class CursoController extends Controller
         return response()->download($rutaArchivo, 'Listado_Participantes.xlsx');
     }
 
-
-    public function ExtractList(Curso $curso, Excel $excel)
-    {
-        $fileName = 'Participantes_' . $curso->nombre . '_' . $curso->id . '.xlsx';
-
-        return $excel->download(new ParticipantsExport($curso->id), $fileName);
-    }
-
     public function deleteSelectedParticipants(Request $request, Curso $curso)
     {
-        $participantes = $request->input('participantes', []);
+        $participantesIds = $request->input('participantes', []);
 
-        foreach ($participantes as $participante) {
-            $participante = json_decode($participante, true);
-            $tipo_documento = $participante['tipo_documento'];
-            $numero_documento = $participante['numero_documento'];
+        foreach ($participantesIds as $participanteId) {
+            
+            $participante = Participante::findOrFail($participanteId);
 
-            // Eliminar la relación entre el curso y los participantes seleccionados
-            CursoParticipante::where([
-                ['curso_id', '=', $curso->id],
-                ['participante_tipo_documento', '=', $tipo_documento],
-                ['participante_numero_documento', '=', $numero_documento]
-            ])->delete();
+            
+            CursoParticipante::where('curso_id', $curso->id)
+                ->where('participante_id', $participanteId) 
+                ->delete();
 
-            // Verificar si el participante está asociado a otros cursos
-            $otrosCursos = CursoParticipante::where([
-                ['participante_tipo_documento', '=', $tipo_documento],
-                ['participante_numero_documento', '=', $numero_documento]
-            ])->exists();
+            $otrosCursos = CursoParticipante::where('participante_id', $participanteId)
+                ->exists();
 
-            // Si no está asociado a otros cursos, eliminar el participante
             if (!$otrosCursos) {
-                Participante::where([
-                    ['tipo_documento', '=', $tipo_documento],
-                    ['numero_documento', '=', $numero_documento]
-                ])->delete();
+                $participante->delete();
             }
         }
 
         return redirect()->back()->with('success', 'Participantes eliminados correctamente.');
+    }
+
+    public function ExtractList(Curso $curso, Excel $excel)
+    {
+        $fileName = 'Participantes_' . $curso->nombre . '_' . $curso->id . '.xlsx';
+        return $excel->download(new ParticipantsExport($curso->id), $fileName);
     }
 }

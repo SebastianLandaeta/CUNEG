@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,16 +12,9 @@ return new class extends Migration
     {
         Schema::create('curso_participantes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('curso_id');
-            $table->string('participante_tipo_documento');
-            $table->string('participante_numero_documento');
+            $table->foreignId('curso_id')->constrained('cursos');
+            $table->foreignId('participante_id')->constrained('participantes'); // Nueva clave foránea
             $table->string('rol');
-            
-            // Definir las claves foráneas
-            $table->foreign('curso_id')->references('id')->on('cursos')->onDelete('cascade');
-            $table->foreign(['participante_tipo_documento', 'participante_numero_documento'])
-            ->references(['tipo_documento', 'numero_documento'])
-            ->on('participantes')->onDelete('cascade');
         });
     }
 
@@ -34,4 +26,3 @@ return new class extends Migration
         Schema::dropIfExists('curso_participantes');
     }
 };
-

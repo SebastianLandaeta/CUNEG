@@ -30,7 +30,7 @@ class ProcesarParticipantes
 
     public static function valid_rol($rol)
     {
-        return $rol === "Participante" || $rol === "Instructor" || $rol === "Facilitador";
+        return in_array($rol, ['Participante', 'Instructor', 'Facilitador']);
     }
 
     public static function verify_documento_repetido($tipoDocumento, $numeroDocumento, $participantes)
@@ -103,6 +103,7 @@ class ProcesarParticipantes
         foreach ($participantes as $participante) {
             $tipoDocumento = $participante['tipo_documento'];
             $numeroDocumento = $participante['numero_documento'];
+            $rol = $participante['rol']; // Asegúrate de que el rol esté disponible aquí
 
             $existingParticipante = Participante::where('tipo_documento', $tipoDocumento)
                                                 ->where('numero_documento', $numeroDocumento)
@@ -114,22 +115,31 @@ class ProcesarParticipantes
                     'numero_documento' => $participante['numero_documento'],
                     'nombre' => $participante['nombre'],
                     'apellido' => $participante['apellido'],
-                    'email' => $participante['email'],
+                    'email' => $participante['email']
                 ]);
 
                 if ($newParticipante->save()) {
-                    $newParticipants[] = $newParticipante;
+                    $newParticipants[] = [
+                        'data' => $newParticipante,
+                        'rol' => $rol // Guarda el rol junto con el participante nuevo
+                    ];
+
                     CursoParticipante::create([
                         'curso_id' => $curso->id,
-                        'participante_tipo_documento' => $newParticipante->tipo_documento,
-                        'participante_numero_documento' => $newParticipante->numero_documento,
-                        'rol' => $participante['rol']
+                        'participante_id' => $newParticipante->id,
+                        'rol' => $rol // Aquí se usa el rol almacenado
                     ]);
                 } else {
-                    $failedParticipants[] = $newParticipante;
+                    $failedParticipants[] = [
+                        'data' => $newParticipante,
+                        'rol' => $rol // Guarda el rol junto con el participante que falló al guardar
+                    ];
                 }
             } else {
-                $updated = false;
+                $updated = true;
+                $oldAttributes = $existingParticipante->getAttributes();
+                $newAttributes = $participante;
+
                 if ($existingParticipante->nombre !== $participante['nombre']) {
                     $existingParticipante->nombre = $participante['nombre'];
                     $updated = true;
@@ -146,16 +156,20 @@ class ProcesarParticipantes
                 }
 
                 if ($updated && $existingParticipante->save()) {
-                    $updatedParticipants[] = $existingParticipante;
+                    $updatedParticipants[] = [
+                        'participante' => $existingParticipante,
+                        'oldAttributes' => $oldAttributes,
+                        'newAttributes' => $newAttributes,
+                        'rol' => $rol // Guarda el rol junto con el participante actualizado
+                    ];
                 }
 
                 CursoParticipante::updateOrCreate(
                     [
                         'curso_id' => $curso->id,
-                        'participante_tipo_documento' => $existingParticipante->tipo_documento,
-                        'participante_numero_documento' => $existingParticipante->numero_documento,
+                        'participante_id' => $existingParticipante->id,
                     ],
-                    ['rol' => $participante['rol']]
+                    ['rol' => $rol] // Aquí se usa el rol almacenado
                 );
             }
         }
@@ -166,4 +180,6 @@ class ProcesarParticipantes
             'failed' => $failedParticipants
         ];
     }
+
+
 }

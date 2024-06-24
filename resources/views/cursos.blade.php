@@ -166,21 +166,23 @@
                                             <td>Nombre</td>
                                             <td>Apellido</td>
                                             <td>Email</td>
+                                            <td>Rol</td>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($curso->cursoParticipantes as $cursoParticipante)
+                                        @foreach ($curso->participantes as $participante)
                                             <tr>
-                                                <td>{{ $cursoParticipante->participante->tipo_documento }}</td>
-                                                <td>{{ $cursoParticipante->participante->numero_documento }}</td>
-                                                <td>{{ $cursoParticipante->participante->nombre }}</td>
-                                                <td>{{ $cursoParticipante->participante->apellido }}</td>
-                                                <td>{{ $cursoParticipante->participante->email }}</td>
+                                                <td>{{ $participante->tipo_documento }}</td>
+                                                <td>{{ $participante->numero_documento }}</td>
+                                                <td>{{ $participante->nombre }}</td>
+                                                <td>{{ $participante->apellido }}</td>
+                                                <td>{{ $participante->email }}</td>
+                                                <td>{{$participante->pivot->rol}}</td>
                                                 <td>
                                                     <div>
-                                                        <button type="button" class="btn btn-warning">
+                                                        <a href="{{ route('participante.modificar', ['participante' => $participante]) }}" class="btn btn-warning">
                                                             Modificar Datos
-                                                        </button>
+                                                        </a>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -203,46 +205,76 @@
 
                         <!-- Modal para AGREGAR un participante -->
                         @component('components.modal')
-                            @slot('ModalTitle', 'Agregar Participante al Curso ' . $curso->nombre)
-                            @slot('ModalId', 'AgregarParticipanteModal')
-                            @slot('ModalLabel', 'AgregarParticipanteModalLabel')
-                            @slot('ModalSize', 'modal-dialog')
-                            <div class="modal-body">
-                                <form id="formAgregarParticipante" method="POST" action="{{ route('cursos.addParticipante', $curso->id) }}">
-                                    @csrf
-                                    <div class="mb-3">
-                                        <label for="tipo_documento" class="form-label">Tipo de Documento</label>
-                                        <input type="text" class="form-control" id="tipo_documento" name="tipo_documento" required>
+                        @slot('ModalTitle', 'Agregar Participante al Curso ' . $curso->nombre)
+                        @slot('ModalId', 'AgregarParticipanteModal')
+                        @slot('ModalLabel', 'AgregarParticipanteModalLabel')
+                        @slot('ModalSize', 'modal-dialog')
+                        <div class="modal-body">
+                            <form id="formAgregarParticipante" method="POST" action="{{ route('cursos.addParticipante', $curso->id) }}">
+                                @csrf
+                                @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="numero_documento" class="form-label">Número de Documento</label>
-                                        <input type="text" class="form-control" id="numero_documento" name="numero_documento" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="nombre" class="form-label">Nombre</label>
-                                        <input type="text" class="form-control" id="nombre" name="nombre" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="apellido" class="form-label">Apellido</label>
-                                        <input type="text" class="form-control" id="apellido" name="apellido" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="rol" class="form-label">Rol</label>
-                                        <select class="form-control" id="rol" name="rol" required>
-                                            <option value="Participante">Participante</option>
-                                            <option value="Instructor">Instructor</option>
-                                            <option value="Facilitador">Facilitador</option>
-                                        </select>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Agregar Participante</button>
-                                </form>
-                            </div>
-                        @endcomponent
+                                @endif
+                                <div class="mb-3">
+                                    <label for="tipo_documento" class="form-label">Tipo de Documento</label>
+                                    <input type="text" class="form-control @error('tipo_documento') is-invalid @enderror" id="tipo_documento" name="tipo_documento" value="{{ old('tipo_documento') }}" required>
+                                    @error('tipo_documento')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label for="numero_documento" class="form-label">Número de Documento</label>
+                                    <input type="text" class="form-control @error('numero_documento') is-invalid @enderror" id="numero_documento" name="numero_documento" value="{{ old('numero_documento') }}" required>
+                                    @error('numero_documento')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control @error('nombre') is-invalid @enderror" id="nombre" name="nombre" value="{{ old('nombre') }}" required>
+                                    @error('nombre')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label for="apellido" class="form-label">Apellido</label>
+                                    <input type="text" class="form-control @error('apellido') is-invalid @enderror" id="apellido" name="apellido" value="{{ old('apellido') }}" required>
+                                    @error('apellido')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
+                                    @error('email')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label for="rol" class="form-label">Rol</label>
+                                    <select class="form-control @error('rol') is-invalid @enderror" id="rol" name="rol" required>
+                                        <option value="">Seleccionar Rol</option>
+                                        <option value="Participante" @if (old('rol') == 'Participante') selected @endif>Participante</option>
+                                        <option value="Instructor" @if (old('rol') == 'Instructor') selected @endif>Instructor</option>
+                                        <option value="Facilitador" @if (old('rol') == 'Facilitador') selected @endif>Facilitador</option>
+                                    </select>
+                                    @error('rol')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <button type="submit" class="btn btn-primary">Agregar Participante</button>
+                            </form>
+                        </div>
+                    @endcomponent
 
+                        
+                        <!--Modal para eliminar participantes-->
                         @component('components.modal')
                             @slot('ModalTitle', 'Eliminar participantes de ' . $curso->nombre)
                             @slot('ModalId', 'ModalDeEliminacionParticipantes' . $curso->id)
@@ -266,16 +298,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($curso->cursoParticipantes as $cursoParticipante)
+                                            @foreach ($curso->participantes as $participante)
                                                 <tr>
                                                     <td>
-                                                        <input type="checkbox" name="participantes[]" class="form-check-input" value="{{ json_encode(['tipo_documento' => $cursoParticipante->participante_tipo_documento, 'numero_documento' => $cursoParticipante->participante_numero_documento]) }}">
+                                                        <input type="checkbox" name="participantes[]" class="form-check-input" value="{{ $participante->id }}">
                                                     </td>
-                                                    <td>{{ $cursoParticipante->participante->tipo_documento }}</td>
-                                                    <td>{{ $cursoParticipante->participante->numero_documento }}</td>
-                                                    <td>{{ $cursoParticipante->participante->nombre }}</td>
-                                                    <td>{{ $cursoParticipante->participante->apellido }}</td>
-                                                    <td>{{ $cursoParticipante->participante->email }}</td>
+                                                    <td>{{ $participante->tipo_documento }}</td>
+                                                    <td>{{ $participante->numero_documento }}</td>
+                                                    <td>{{ $participante->nombre }}</td>
+                                                    <td>{{ $participante->apellido }}</td>
+                                                    <td>{{ $participante->email }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

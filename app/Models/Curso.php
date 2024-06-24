@@ -11,6 +11,12 @@ class Curso extends Model
 
     protected $fillable = ['nombre', 'descripcion', 'f_inicio', 'f_finalizacion', 'horas_academicas'];
 
+    public function participantes()
+    {
+        return $this->belongsToMany(Participante::class, 'curso_participantes', 'curso_id', 'participante_id')
+                    ->withPivot('rol'); 
+    }
+
     public function cursoParticipantes()
     {
         return $this->hasMany(CursoParticipante::class, 'curso_id', 'id');

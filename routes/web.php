@@ -5,8 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\PizarraController;
 use App\Http\Controllers\CertificadoController;
-
-//prueba
 use App\Http\Controllers\ParticipanteController;
 
 // Inicio
@@ -14,7 +12,7 @@ Route::get('/', function () {
     return view('index');
 })->name('index');
 
-
+//Cursos
 Route::prefix('cursos')->group(function () {
     Route::get('/', [CursoController::class, 'index'])->name('cursos.index');
     Route::post('/', [CursoController::class, 'create'])->name('cursos.create');
@@ -23,14 +21,18 @@ Route::prefix('cursos')->group(function () {
     Route::delete('/{curso}', [CursoController::class, 'destroy'])->name('cursos.destroy');
 
     Route::post('/cargarLista/{curso}', [CursoController::class, 'loadList'])->name('curso.loadList');
-    Route::delete('/deleteSelectedParticipants/{curso}', [CursoController::class, 'deleteSelectedParticipants'])->name('curso.deleteSelectedParticipants');
     Route::post('/add-participante/{curso}', [CursoController::class, 'addParticipante'])->name('cursos.addParticipante');
+
+    Route::delete('/deleteSelectedParticipants/{curso}', [CursoController::class, 'deleteSelectedParticipants'])->name('curso.deleteSelectedParticipants');
 });
 
-// Curso
-//Route::get('/cursos', [CursoController::class, 'index'])->name('cursos');
 
-//Route::post('/cursos', [CursoController::class, 'store'])->name('cursos');
+//Participantes (Accciones que afectan directamente a los usuarios)
+Route::prefix('participantes')->group(function () {
+    Route::get('modificar/{participante}', [ParticipanteController::class, 'modificar_participante'])->name('participante.modificar');
+    Route::post('verificar-documento', [ParticipanteController::class, 'verificarDocumento'])->name('participante.verificarDocumento');
+    Route::put('actualizar/{participante}', [ParticipanteController::class, 'actualizar_participante'])->name('participante.actualizar');
+});
 
 
 Route::get('/cursos/buscar', [CursoController::class, 'search'])->name('cursos.search');
@@ -39,9 +41,6 @@ Route::get('/cursos/buscar', [CursoController::class, 'search'])->name('cursos.s
 
 Route::get('/download-excel-example',[CursoController::class, 'downloadExcelExample'])->name('d-excel');
 
-Route::get('curso/LoadList/{curso}', [CursoController::class, 'ExtractList'])->name('curso.ExtractList');
-
-Route::delete('/curso/{curso}/deleteList', [CursoController::class, 'deleteList'])->name('curso.deleteList');
 
 // QR
 Route::get('certificate_search_qr', [QrController::class, 'index'])->name('qr.search');
@@ -78,6 +77,3 @@ Route::post('/guardar-certificado', [CertificadoController::class, 'guardadoCert
 Route::post('/correo-certificado', [CertificadoController::class, 'correo_envio'])->name('correo_envio');
 
 
-
-Route::get('participantes/create', [ParticipanteController::class, 'create'])->name('participantes.create');
-Route::post('participantes', [ParticipanteController::class, 'store'])->name('participantes.store');
